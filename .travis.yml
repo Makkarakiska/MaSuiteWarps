@@ -2,10 +2,12 @@ language: java
 sudo: false
 jdk:
 - oraclejdk8
+
 deploy:
-  provider: pages
+  provider: releases
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
-  keep-history: true
+  file: "MaSuiteWarps.jar"
   on:
+    tags: true
     branch: master
