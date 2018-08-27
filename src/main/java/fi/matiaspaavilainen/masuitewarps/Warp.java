@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Warp {
 
@@ -131,8 +133,8 @@ public class Warp {
         return warp;
     }
 
-    public HashMap<Integer, Warp> all(){
-        HashMap<Integer, Warp> warps = new HashMap<>();
+    public Set<Warp> all(){
+        Set<Warp> warps = new HashSet<>();
         ResultSet rs = null;
 
         try {
@@ -152,7 +154,9 @@ public class Warp {
                 warp.setZ(rs.getDouble("z"));
                 warp.setYaw(rs.getDouble("yaw"));
                 warp.setPitch(rs.getDouble("pitch"));
-                warps.put(warp.getId(), warp);
+                warp.setHidden(rs.getBoolean("hidden"));
+                warp.setGlobal(rs.getBoolean("global"));
+                warps.add(warp);
             }
 
 

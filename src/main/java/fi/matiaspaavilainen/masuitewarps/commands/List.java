@@ -8,6 +8,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class List extends Command {
     public List() {
@@ -19,25 +20,17 @@ public class List extends Command {
         Warp w = new Warp();
         Formator formator = new Formator();
 
-        StringBuilder global = new StringBuilder();
-        StringBuilder hidden = new StringBuilder();
+        String global = "&7Global warps: &b";
+        String server = "&7Server warps: &b";
+        String hidden = "&7Hidden warps: &b";
 
-        global.append("&7Global warps: ");
-        hidden.append("&7Hidden warps: ");
+        global = global + w.all().stream().filter(Warp::isGlobal).map(Warp::getName).collect(Collectors.joining("&7, &b"));
+        //server = server + w.all().stream().filter(wp -> !wp.isGlobal()).map(Warp::getName).collect(Collectors.joining("&7, &b"));
+        hidden = hidden + w.all().stream().filter(Warp::isHidden).map(Warp::getName).collect(Collectors.joining("&7, &b"));
 
-        for(Map.Entry<Integer, Warp> wp : w.all().entrySet()){
-            Warp warp = wp.getValue();
-            System.out.println(warp.getName() + warp.isHidden());
-            hidden.append("&b").append(warp.getName()).append("&7, ");
-            /*if(warp.isHidden()){
-                hidden.append("&b").append(warp.getName()).append("&7, ");
-            }
-            if(warp.isGlobal()){
-                global.append("&b").append(warp.getName()).append("&7, ");
-            }*/
-        }
-        cs.sendMessage(new TextComponent(formator.colorize(global.toString())));
-        cs.sendMessage(new TextComponent(formator.colorize(hidden.toString())));
+        cs.sendMessage(new TextComponent(formator.colorize(global)));
+        cs.sendMessage(new TextComponent(formator.colorize(server)));
+        cs.sendMessage(new TextComponent(formator.colorize(hidden)));
 
     }
 }
