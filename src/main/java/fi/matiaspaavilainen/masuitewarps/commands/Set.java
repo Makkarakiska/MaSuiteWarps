@@ -2,40 +2,60 @@ package fi.matiaspaavilainen.masuitewarps.commands;
 
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuitecore.listeners.MaSuitePlayerLocation;
+import fi.matiaspaavilainen.masuitecore.managers.Location;
+import fi.matiaspaavilainen.masuitecore.managers.MaSuitePlayer;
+import fi.matiaspaavilainen.masuitewarps.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.Warp;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class Set extends Command {
-    public Set() {
+
+    private MaSuiteWarps plugin;
+
+    public Set(MaSuiteWarps p) {
         super("setwarp", "masuitewarps.setwarp");
+        plugin = p;
     }
 
     @Override
     public void execute(CommandSender cs, String[] args) {
         Configuration config = new Configuration();
         Formator formator = new Formator();
-        if(!(cs instanceof ProxiedPlayer)){
+        if (!(cs instanceof ProxiedPlayer)) {
             return;
         }
         ProxiedPlayer sender = (ProxiedPlayer) cs;
-        if(args.length == 1){
-            Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), "world", 100.0, 100.0, 100.0, 10.0, 100.0, false, true);
+        if (args.length == 1) {
+            MaSuitePlayer msp = new MaSuitePlayer().find(sender.getUniqueId());
+            msp.requestLocation();
+            Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
+            Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), false, true);
             warp.create(warp);
-        }
-        else if(args.length == 2){
-            if(args[1].equalsIgnoreCase("hidden") || args[1].equalsIgnoreCase("global")){
-                Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), "world", 100.0, 100.0, 100.0, 10.0, 100.0, false, true);
-                warp.create(warp);
-            }else{
+            MaSuitePlayerLocation.locations.remove(sender.getUniqueId());
+
+        } else if (args.length == 3) {
+            MaSuitePlayer msp = new MaSuitePlayer().find(sender.getUniqueId());
+            msp.requestLocation();
+            Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
+
+            boolean hidden = false;
+            boolean global = true;
+            if (args[1].equalsIgnoreCase("hidden")) {
+                hidden = args[2].equalsIgnoreCase("true");
+            } else if (args[1].equalsIgnoreCase("global")) {
+                global = args[2].equalsIgnoreCase("true");
+            } else {
                 formator.sendMessage(sender, config.load("warps", "syntax.yml").getString("warp.set"));
             }
 
-        }
-        else{
-            // config.load("warps", "syntax.yml").getString("warp.set")
-            formator.sendMessage(sender, "test");
+            Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), hidden, global);
+            formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
+            MaSuitePlayerLocation.locations.remove(sender.getUniqueId());
+        } else {
+            formator.sendMessage(sender, config.load("warps", "syntax.yml").getString("warp.set"));
         }
 
     }

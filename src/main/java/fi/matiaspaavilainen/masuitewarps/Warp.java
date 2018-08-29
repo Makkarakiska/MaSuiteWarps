@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,13 +29,13 @@ public class Warp {
     private Double x;
     private Double y;
     private Double z;
-    private Double yaw;
-    private Double pitch;
+    private Float yaw;
+    private Float pitch;
 
     public Warp() {
     }
 
-    public Warp(String name, String server, String world, Double x, Double y, Double z, Double yaw, Double pitch, Boolean hidden, Boolean global) {
+    public Warp(String name, String server, String world, Double x, Double y, Double z, Float yaw, Float pitch, Boolean hidden, Boolean global) {
         this.name = name;
         this.server = server;
         this.hidden = hidden;
@@ -52,7 +51,8 @@ public class Warp {
 
     public void create(Warp warp) {
         String insert = "INSERT INTO " + tablePrefix +
-                "warps (name, server, world, x, y, z, yaw, pitch, hidden, global) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "warps (name, server, world, x, y, z, yaw, pitch, hidden, global) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE name = ?, server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, hidden = ?, global = ?;";
         try {
             connection = db.hikari.getConnection();
             statement = connection.prepareStatement(insert);
@@ -66,6 +66,16 @@ public class Warp {
             statement.setDouble(8, warp.getZ());
             statement.setBoolean(9, warp.isHidden());
             statement.setBoolean(10, warp.isGlobal());
+            statement.setString(11, warp.getName());
+            statement.setString(12, warp.getServer());
+            statement.setString(13, warp.getWorld());
+            statement.setDouble(14, warp.getX());
+            statement.setDouble(15, warp.getY());
+            statement.setDouble(16, warp.getZ());
+            statement.setDouble(17, warp.getY());
+            statement.setDouble(18, warp.getZ());
+            statement.setBoolean(19, warp.isHidden());
+            statement.setBoolean(20, warp.isGlobal());
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -86,10 +96,13 @@ public class Warp {
 
         try {
             connection = MaSuiteCore.db.hikari.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM masuite_warps WHERE name LIKE ?");
+            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "warps WHERE name LIKE ?");
             statement.setString(1, name);
             rs = statement.executeQuery();
 
+            if(rs == null){
+                return new Warp();
+            }
             while (rs.next()) {
                 warp.setId(rs.getInt("id"));
                 warp.setName(rs.getString("name"));
@@ -100,8 +113,8 @@ public class Warp {
                 warp.setX(rs.getDouble("x"));
                 warp.setY(rs.getDouble("y"));
                 warp.setZ(rs.getDouble("z"));
-                warp.setYaw(rs.getDouble("yaw"));
-                warp.setPitch(rs.getDouble("pitch"));
+                warp.setYaw(rs.getFloat("yaw"));
+                warp.setPitch(rs.getFloat("pitch"));
             }
 
 
@@ -139,7 +152,7 @@ public class Warp {
 
         try {
             connection = MaSuiteCore.db.hikari.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM masuite_warps");
+            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "_warps;");
             rs = statement.executeQuery();
             while (rs.next()) {
                 Warp warp = new Warp();
@@ -152,8 +165,8 @@ public class Warp {
                 warp.setX(rs.getDouble("x"));
                 warp.setY(rs.getDouble("y"));
                 warp.setZ(rs.getDouble("z"));
-                warp.setYaw(rs.getDouble("yaw"));
-                warp.setPitch(rs.getDouble("pitch"));
+                warp.setYaw(rs.getFloat("yaw"));
+                warp.setPitch(rs.getFloat("pitch"));
                 warp.setHidden(rs.getBoolean("hidden"));
                 warp.setGlobal(rs.getBoolean("global"));
                 warps.add(warp);
@@ -244,19 +257,19 @@ public class Warp {
         this.z = z;
     }
 
-    public Double getYaw() {
+    public Float getYaw() {
         return yaw;
     }
 
-    public void setYaw(Double yaw) {
+    public void setYaw(Float yaw) {
         this.yaw = yaw;
     }
 
-    public Double getPitch() {
+    public Float getPitch() {
         return pitch;
     }
 
-    public void setPitch(Double pitch) {
+    public void setPitch(Float pitch) {
         this.pitch = pitch;
     }
 

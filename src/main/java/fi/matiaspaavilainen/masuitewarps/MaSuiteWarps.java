@@ -14,7 +14,8 @@ public class MaSuiteWarps extends Plugin {
         super.onEnable();
         Configuration config = new Configuration();
         config.create(this, "warps","syntax.yml");
-        getProxy().getPluginManager().registerCommand(this, new Set());
+        config.create(this, "warps","messages.yml");
+        getProxy().getPluginManager().registerCommand(this, new Set(this));
         getProxy().getPluginManager().registerCommand(this, new Teleport());
         getProxy().getPluginManager().registerCommand(this, new List());
         MaSuiteCore.db.createTable("warps",

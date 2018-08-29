@@ -1,1 +1,3 @@
 warp-not-found: "&cThat warp point does not exists!"
+warp-created: "&7Created warp with name &b%warp%"
+teleported: "&7Teleported to &b%warp%"
