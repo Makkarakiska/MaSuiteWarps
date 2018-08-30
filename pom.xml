@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fi.matiaspaavilainen</groupId>
-    <artifactId>masuitewarps</artifactId>
+    <artifactId>MaSuiteWarps</artifactId>
     <version>1.0</version>
     <build>
         <plugins>

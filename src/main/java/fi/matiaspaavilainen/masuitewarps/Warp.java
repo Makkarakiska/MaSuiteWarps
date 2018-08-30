@@ -62,8 +62,8 @@ public class Warp {
             statement.setDouble(4, warp.getX());
             statement.setDouble(5, warp.getY());
             statement.setDouble(6, warp.getZ());
-            statement.setDouble(7, warp.getY());
-            statement.setDouble(8, warp.getZ());
+            statement.setFloat(7, warp.getYaw());
+            statement.setFloat(8, warp.getPitch());
             statement.setBoolean(9, warp.isHidden());
             statement.setBoolean(10, warp.isGlobal());
             statement.setString(11, warp.getName());
@@ -72,8 +72,8 @@ public class Warp {
             statement.setDouble(14, warp.getX());
             statement.setDouble(15, warp.getY());
             statement.setDouble(16, warp.getZ());
-            statement.setDouble(17, warp.getY());
-            statement.setDouble(18, warp.getZ());
+            statement.setFloat(17, warp.getYaw());
+            statement.setFloat(18, warp.getPitch());
             statement.setBoolean(19, warp.isHidden());
             statement.setBoolean(20, warp.isGlobal());
             statement.execute();
