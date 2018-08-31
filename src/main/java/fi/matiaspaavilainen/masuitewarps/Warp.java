@@ -96,7 +96,7 @@ public class Warp {
 
         try {
             connection = MaSuiteCore.db.hikari.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "warps WHERE name LIKE ?");
+            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "warps WHERE name = ?");
             statement.setString(1, name);
             rs = statement.executeQuery();
 
@@ -115,6 +115,8 @@ public class Warp {
                 warp.setZ(rs.getDouble("z"));
                 warp.setYaw(rs.getFloat("yaw"));
                 warp.setPitch(rs.getFloat("pitch"));
+                warp.setHidden(rs.getBoolean("hidden"));
+                warp.setGlobal(rs.getBoolean("global"));
             }
 
 
@@ -146,13 +148,52 @@ public class Warp {
         return warp;
     }
 
+    public Boolean delete(String name){
+        Warp warp = new Warp();
+        ResultSet rs = null;
+
+        try {
+            connection = MaSuiteCore.db.hikari.getConnection();
+            statement = connection.prepareStatement("DELETE FROM " + tablePrefix + "warps WHERE name = ?");
+            statement.setString(1, name);
+            statement.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
+
     public Set<Warp> all(){
         Set<Warp> warps = new HashSet<>();
         ResultSet rs = null;
 
         try {
             connection = MaSuiteCore.db.hikari.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "_warps;");
+            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "warps;");
             rs = statement.executeQuery();
             while (rs.next()) {
                 Warp warp = new Warp();

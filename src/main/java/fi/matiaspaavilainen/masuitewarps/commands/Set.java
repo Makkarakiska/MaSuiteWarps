@@ -19,7 +19,7 @@ public class Set extends Command {
     private MaSuiteWarps plugin;
 
     public Set(MaSuiteWarps p) {
-        super("setwarp", "masuitewarps.setwarp");
+        super("setwarp", "masuitewarps.setwarp", "warpset", "createwarp");
         plugin = p;
     }
 
@@ -34,37 +34,55 @@ public class Set extends Command {
         if (args.length == 1) {
             MaSuitePlayer msp = new MaSuitePlayer().find(sender.getUniqueId());
             msp.requestLocation();
+            Warp wp = new Warp();
+            wp = wp.find(args[0]);
+            Warp finalWp = wp;
             ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
                 @Override
                 public void run() {
                     Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
                     Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), false, true);
                     warp.create(warp);
-                    formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
+                    if(finalWp.getServer() != null){
+                        formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
+                    }else{
+                        formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
+                    }
                 }
-            }, 2, TimeUnit.SECONDS)
-            ;
-
+            }, 200, TimeUnit.MILLISECONDS);
             MaSuitePlayerLocation.locations.remove(sender.getUniqueId());
 
-        } else if (args.length == 3) {
+        } else if (args.length == 2) {
             MaSuitePlayer msp = new MaSuitePlayer().find(sender.getUniqueId());
             msp.requestLocation();
             Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
 
+            Warp wp = new Warp();
+            wp = wp.find(args[0]);
             boolean hidden = false;
             boolean global = true;
+            if(wp.getServer() != null){
+                hidden = wp.isHidden();
+                global = wp.isGlobal();
+            }
+
             if (args[1].equalsIgnoreCase("hidden")) {
-                hidden = args[2].equalsIgnoreCase("true");
+                hidden = !hidden;
             } else if (args[1].equalsIgnoreCase("global")) {
-                global = args[2].equalsIgnoreCase("true");
+                global = !global;
             } else {
                 formator.sendMessage(sender, config.load("warps", "syntax.yml").getString("warp.set"));
+                return;
             }
 
             Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), hidden, global);
             warp.create(warp);
-            formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
+            if(wp.getServer() != null){
+                formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
+            }else{
+                formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
+            }
+
             MaSuitePlayerLocation.locations.remove(sender.getUniqueId());
         } else {
             formator.sendMessage(sender, config.load("warps", "syntax.yml").getString("warp.set"));

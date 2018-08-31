@@ -1,3 +1,11 @@
 warp-not-found: "&cThat warp point does not exists!"
 warp-created: "&7Created warp with name &b%warp%"
+warp-updated: "&7Updated warp with name &b%warp%"
+warp-in-other-server: "&cWarp is in the other server!"
 teleported: "&7Teleported to &b%warp%"
+warp-deleted: "&7Warp has been deleted!"
+warp:
+  global: "&7Global warps: &b"
+  server: "&7Server warps: &b"
+  hidden: "&7Hidden warps: &b"
+  split: "&7, &b" #Splits warps (first color colors comma and the second one colors warp name
