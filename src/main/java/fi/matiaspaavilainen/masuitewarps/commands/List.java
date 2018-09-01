@@ -29,8 +29,8 @@ public class List extends Command {
         String hidden = config.load("warps", "messages.yml").getString("warp.hidden");
 
         Set<Warp> warps = w.all();
-        global = global + warps.stream().filter(Warp::isGlobal).map(Warp::getName).collect(Collectors.joining(config.load("warps", "messages.yml").getString("warp.split")));
-        server = server + warps.stream().filter(wp -> wp.isGlobal().equals(false) && wp.getServer().equals(p.getServer().getInfo().getName())).map(Warp::getName).collect(Collectors.joining(config.load("warps", "messages.yml").getString("warp.split")));
+        global = global + warps.stream().filter(wp -> wp.isGlobal() && wp.isHidden().equals(false)).map(Warp::getName).collect(Collectors.joining(config.load("warps", "messages.yml").getString("warp.split")));
+        server = server + warps.stream().filter(wp -> wp.isGlobal().equals(false) && wp.getServer().equals(p.getServer().getInfo().getName())&& wp.isHidden().equals(false)).map(Warp::getName).collect(Collectors.joining(config.load("warps", "messages.yml").getString("warp.split")));
         hidden = hidden + warps.stream().filter(Warp::isHidden).map(Warp::getName).collect(Collectors.joining(config.load("warps", "messages.yml").getString("warp.split")));
 
         if(cs.hasPermission("masuitewarps.list.global")) {

@@ -6,7 +6,7 @@
 
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteWarps</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <build>
         <plugins>
             <plugin>
@@ -44,5 +44,4 @@
             <version>18cef61e6c</version>
         </dependency>
     </dependencies>
-
 </project>
