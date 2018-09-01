@@ -47,8 +47,13 @@ public class Teleport extends Command {
             }
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
+            if (warp.isHidden() && !cs.hasPermission("masuitewarps.warp.hidden")) {
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+                return;
+            }
             warp(p, warp, b, out);
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
+
         } else if (args.length == 2) {
             if (p.hasPermission("masuitewarps.warp.others")) {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);

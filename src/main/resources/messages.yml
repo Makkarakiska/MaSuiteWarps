@@ -4,6 +4,7 @@ warp-updated: "&7Updated warp with name &b%warp%"
 warp-in-other-server: "&cWarp is in the other server!"
 teleported: "&7Teleported to &b%warp%"
 warp-deleted: "&7Warp has been deleted!"
+no-permission: "&cNo permission"
 warp:
   global: "&7Global warps: &b"
   server: "&7Server warps: &b"
