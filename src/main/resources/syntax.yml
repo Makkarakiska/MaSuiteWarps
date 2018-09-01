@@ -1,4 +1,4 @@
 warp:
   set: "&cCorrect syntax: /setwarp <name> (<hidden/global>)"
-  teleport: "&cCorrect syntax: /warp <name>"
+  teleport: "&cCorrect syntax: /warp <name> (<player>)"
   delete: "&cCorrect syntax: /delwarp <name>"

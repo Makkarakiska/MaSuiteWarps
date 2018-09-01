@@ -21,6 +21,6 @@ public class MaSuiteWarps extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new List());
         getProxy().getPluginManager().registerCommand(this, new Delete());
         MaSuiteCore.db.createTable("warps",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) UNIQUE NOT NULL, server VARCHAR(255) NOT NULL, world VARCHAR(255) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1));");
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
     }
 }
