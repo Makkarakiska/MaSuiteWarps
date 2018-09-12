@@ -1,6 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps;
 
 import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
+import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitewarps.commands.Delete;
 import fi.matiaspaavilainen.masuitewarps.commands.List;
@@ -32,6 +33,8 @@ public class MaSuiteWarps extends Plugin implements Listener {
         getProxy().getPluginManager().registerCommand(this, new Delete());
         MaSuiteCore.db.createTable("warps",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        new Updator().checkVersion(this.getDescription(), "60454");
     }
 
     @EventHandler
