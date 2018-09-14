@@ -13,11 +13,11 @@ import java.util.Set;
 
 public class Warp {
 
-    Database db = MaSuiteCore.db;
-    Connection connection = null;
-    PreparedStatement statement = null;
-    Configuration config = new Configuration();
-    String tablePrefix = config.load(null, "config.yml").getString("database.table-prefix");
+    private Database db = MaSuiteWarps.db;
+    private Connection connection = null;
+    private PreparedStatement statement = null;
+    private Configuration config = new Configuration();
+    private String tablePrefix = config.load(null, "config.yml").getString("database.table-prefix");
     // Info
     private int id;
     private String name;

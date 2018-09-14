@@ -16,44 +16,23 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class Teleport extends Command {
-    MaSuiteWarps plugin;
 
-    public Teleport(MaSuiteWarps p) {
+    public Teleport() {
         super("warp", "masuitewarps.warp", "warpto");
-        plugin = p;
     }
-
+    private Formator formator = new Formator();
+    private Configuration config = new Configuration();
     @Override
     public void execute(CommandSender cs, String[] args) {
         if (!(cs instanceof ProxiedPlayer)) {
             return;
         }
         ProxiedPlayer p = (ProxiedPlayer) cs;
-        Formator formator = new Formator();
-        Configuration config = new Configuration();
+
         if (args.length == 1) {
             Warp warp = new Warp();
             warp = warp.find(args[0]);
-            if (warp.getServer() == null) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
-                return;
-            }
-            if (!warp.isGlobal()) {
-                if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
-                    return;
-                }
-
-            }
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(b);
-            if (warp.isHidden() && !cs.hasPermission("masuitewarps.warp.hidden")) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-                return;
-            }
-            warp(p, warp, b, out);
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
-
+            warp(p, warp);
         } else if (args.length == 2) {
             if (p.hasPermission("masuitewarps.warp.others")) {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);
@@ -74,10 +53,7 @@ public class Teleport extends Command {
                     }
 
                 }
-                ByteArrayOutputStream b = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(b);
-                warp(target, warp, b, out);
-                formator.sendMessage(target, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
+                warp(target, warp);
             }
         } else {
             formator.sendMessage(p, config.load("warps", "syntax.yml").getString("warp.teleport"));
@@ -85,7 +61,25 @@ public class Teleport extends Command {
 
     }
 
-    private void warp(ProxiedPlayer p, Warp warp, ByteArrayOutputStream b, DataOutputStream out) {
+    public void warp(ProxiedPlayer p, Warp warp) {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(b);
+
+        if (warp.getServer() == null) {
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+            return;
+        }
+        if (!warp.isGlobal()) {
+            if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
+                return;
+            }
+
+        }
+        if (warp.isHidden() && !p.hasPermission("masuitewarps.warp.hidden")) {
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+            return;
+        }
         try {
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
                 p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
@@ -99,8 +93,8 @@ public class Teleport extends Command {
             out.writeFloat(warp.getYaw());
             out.writeFloat(warp.getPitch());
             final Warp wp = warp;
-            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray()), 100, TimeUnit.MILLISECONDS);
-
+            ProxyServer.getInstance().getScheduler().schedule(new MaSuiteWarps(), () -> ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray()), 100, TimeUnit.MILLISECONDS);
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
