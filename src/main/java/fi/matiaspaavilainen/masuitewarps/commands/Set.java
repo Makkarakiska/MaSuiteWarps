@@ -33,20 +33,18 @@ public class Set extends Command {
         ProxiedPlayer sender = (ProxiedPlayer) cs;
         if (args.length == 1) {
             MaSuitePlayer msp = new MaSuitePlayer().find(sender.getUniqueId());
+            msp.requestLocation();
             Warp wp = new Warp();
             wp = wp.find(args[0]);
             Warp finalWp = wp;
-            ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    Location loc = msp.getLocation(sender.getUniqueId());
-                    Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), false, true);
-                    warp.create(warp);
-                    if(finalWp.getServer() != null){
-                        formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
-                    }else{
-                        formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
-                    }
+            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+                Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
+                Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), false, true);
+                warp.create(warp);
+                if(finalWp.getServer() != null){
+                    formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
+                }else{
+                    formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
                 }
             }, 50, TimeUnit.MILLISECONDS);
             MaSuitePlayerLocation.locations.remove(sender.getUniqueId());
@@ -76,17 +74,14 @@ public class Set extends Command {
             boolean finalGlobal = global;
             boolean finalHidden = hidden;
             Warp finalWp = wp;
-            ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
-                    Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), finalHidden, finalGlobal);
-                    warp.create(warp);
-                    if(finalWp.getServer() != null){
-                        formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
-                    }else{
-                        formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
-                    }
+            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+                Location loc = MaSuitePlayerLocation.locations.get(sender.getUniqueId());
+                Warp warp = new Warp(args[0], sender.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), finalHidden, finalGlobal);
+                warp.create(warp);
+                if(finalWp.getServer() != null){
+                    formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
+                }else{
+                    formator.sendMessage(sender, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
                 }
             }, 50, TimeUnit.MILLISECONDS);
             MaSuitePlayerLocation.locations.remove(sender.getUniqueId());

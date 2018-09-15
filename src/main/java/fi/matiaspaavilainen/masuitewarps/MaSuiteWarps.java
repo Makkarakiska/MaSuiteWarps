@@ -54,7 +54,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport();
-            teleport.warp(p, warp);
+            teleport.warp(p, warp, "sign");
         }
     }
 }

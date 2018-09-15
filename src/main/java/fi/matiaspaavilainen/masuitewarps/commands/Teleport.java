@@ -32,7 +32,7 @@ public class Teleport extends Command {
         if (args.length == 1) {
             Warp warp = new Warp();
             warp = warp.find(args[0]);
-            warp(p, warp);
+            warp(p, warp, "command");
         } else if (args.length == 2) {
             if (p.hasPermission("masuitewarps.warp.others")) {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);
@@ -53,7 +53,7 @@ public class Teleport extends Command {
                     }
 
                 }
-                warp(target, warp);
+                warp(target, warp, "command");
             }
         } else {
             formator.sendMessage(p, config.load("warps", "syntax.yml").getString("warp.teleport"));
@@ -61,7 +61,7 @@ public class Teleport extends Command {
 
     }
 
-    public void warp(ProxiedPlayer p, Warp warp) {
+    public void warp(ProxiedPlayer p, Warp warp, String type) {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(b);
 
@@ -76,7 +76,11 @@ public class Teleport extends Command {
             }
 
         }
-        if (warp.isHidden() && !p.hasPermission("masuitewarps.warp.hidden")) {
+        if(type.equals("sign") && (!p.hasPermission("masuitewarps.warp.hidden.sign.use") || !p.hasPermission("masuitewarps.warp.global.sign.use") || !p.hasPermission("masuitewarps.warp.server.sign.use"))){
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+            return;
+        }
+        if (type.equals("command") && warp.isHidden() && !p.hasPermission("masuitewarps.warp.hidden")) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
             return;
         }
