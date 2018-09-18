@@ -11,4 +11,4 @@ warp:
   server: "&7Server warps: &b"
   hidden: "&7Hidden warps: &b"
   name: "&b%warp%"
-  split: "&7" #Splits warps (first color colors comma and the second one colors warp name
+  split: "&7, " #Splits warps (first color colors comma and the second one colors warp name
