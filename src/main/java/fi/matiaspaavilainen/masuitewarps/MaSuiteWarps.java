@@ -27,6 +27,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
         Configuration config = new Configuration();
         config.create(this, "warps","syntax.yml");
         config.create(this, "warps","messages.yml");
+        config.create(this, "warps","settings.yml");
         getProxy().getPluginManager().registerListener(this, this);
         getProxy().getPluginManager().registerCommand(this, new Set(this));
         getProxy().getPluginManager().registerCommand(this, new Teleport());

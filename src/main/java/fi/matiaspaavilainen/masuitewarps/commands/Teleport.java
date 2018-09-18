@@ -69,6 +69,13 @@ public class Teleport extends Command {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
             return;
         }
+        if(config.load("warps","settings.yml").getBoolean("enable-per-warp-permission")){
+            if(!p.hasPermission("masuitewarps.warp.to." + warp.getName().toLowerCase()) && !p.hasPermission("masuitewarps.warp.to.*")){
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+                return;
+            }
+        }
+
         if (!warp.isGlobal()) {
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
