@@ -14,18 +14,10 @@ import net.md_5.bungee.api.plugin.Command;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class List extends Command {
-    public List() {
-        super("warps", "", "listwarps", "warplist");
-    }
+public class List {
 
-    @Override
-    public void execute(CommandSender cs, String[] args) {
-        if (!(cs instanceof ProxiedPlayer)) {
-            return;
-        }
+    public void listWarp(ProxiedPlayer p){
         Warp w = new Warp();
-        ProxiedPlayer p = (ProxiedPlayer) cs;
         Formator formator = new Formator();
         Configuration config = new Configuration();
         TextComponent global = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.global")));
@@ -80,13 +72,13 @@ public class List extends Command {
             }
         }
 
-        if (cs.hasPermission("masuitewarps.list.global")) {
+        if (p.hasPermission("masuitewarps.list.global")) {
             p.sendMessage(global);
         }
-        if (cs.hasPermission("masuitewarps.list.server")) {
+        if (p.hasPermission("masuitewarps.list.server")) {
             p.sendMessage(server);
         }
-        if (cs.hasPermission("masuitewarps.list.hidden")) {
+        if (p.hasPermission("masuitewarps.list.hidden")) {
             p.sendMessage(hidden);
         }
     }
