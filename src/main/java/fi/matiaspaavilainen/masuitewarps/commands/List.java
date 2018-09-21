@@ -81,5 +81,8 @@ public class List {
         if (p.hasPermission("masuitewarps.list.hidden")) {
             p.sendMessage(hidden);
         }
+        if(!p.hasPermission("masuitewarps.list.global") || !p.hasPermission("masuitewarps.list.server") || !p.hasPermission("masuitewarps.list.hiddenn")){
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+        }
     }
 }

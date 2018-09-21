@@ -1,5 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitecore.database.Database;
@@ -11,6 +13,7 @@ import fi.matiaspaavilainen.masuitewarps.commands.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -18,17 +21,19 @@ import net.md_5.bungee.event.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
     public static Database db = new Database();
+
     @Override
     public void onEnable() {
         super.onEnable();
         Configuration config = new Configuration();
-        config.create(this, "warps","syntax.yml");
-        config.create(this, "warps","messages.yml");
-        config.create(this, "warps","settings.yml");
+        config.create(this, "warps", "syntax.yml");
+        config.create(this, "warps", "messages.yml");
+        config.create(this, "warps", "settings.yml");
         getProxy().getPluginManager().registerListener(this, this);
         db.connect();
         db.createTable("warps",
@@ -37,24 +42,43 @@ public class MaSuiteWarps extends Plugin implements Listener {
         new Updator().checkVersion(this.getDescription(), "60454");
     }
 
+    public void onDisable(){
+        db.hikari.close();
+    }
+
+    @EventHandler
+    public void onJoin(PostLoginEvent e) {
+        getProxy().getScheduler().schedule(this, () -> {
+            Warp w = new Warp();
+            StringBuilder warps = new StringBuilder();
+            w.all().forEach(warp -> warps.append(warp.getName()).append(":"));
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("ListWarpsForPlayers");
+            out.writeUTF(warps.toString());
+            e.getPlayer().getServer().sendData("BungeeCord", out.toByteArray());
+        }, 200, TimeUnit.MILLISECONDS);
+
+
+    }
+
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) throws IOException {
-        if(!e.getTag().equals("BungeeCord")){
+        if (!e.getTag().equals("BungeeCord")) {
             return;
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
-        if(subchannel.equals("ListWarps")){
+        if (subchannel.equals("ListWarps")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null){
+            if (p == null) {
                 return;
             }
             List list = new List();
             list.listWarp(p);
         }
-        if(subchannel.equals("WarpSign")){
+        if (subchannel.equals("WarpSign")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null){
+            if (p == null) {
                 return;
             }
             Warp warp = new Warp();
@@ -62,9 +86,9 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Teleport teleport = new Teleport();
             teleport.warp(p, warp, "sign");
         }
-        if(subchannel.equals("WarpCommand")){
+        if (subchannel.equals("WarpCommand")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null){
+            if (p == null) {
                 return;
             }
             Warp warp = new Warp();
@@ -72,10 +96,10 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Teleport teleport = new Teleport();
             teleport.warp(p, warp, "command");
         }
-        if(subchannel.equals("WarpPlayerCommand")){
+        if (subchannel.equals("WarpPlayerCommand")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null || sender == null){
+            if (p == null || sender == null) {
                 return;
             }
             Warp warp = new Warp();
@@ -83,29 +107,42 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Teleport teleport = new Teleport();
             teleport.warp(p, sender, warp, "command");
         }
-        if(subchannel.equals("SetWarp")){
+        if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null){
+            if (p == null) {
                 return;
             }
             String name = in.readUTF();
             String[] location = in.readUTF().split(":");
             Set set = new Set();
-            if(i == 3){
-                set.setWarp(p, name, new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[1])), in.readUTF());
-            }else if (i == 2){
+            if (i == 3) {
+                set.setWarp(p, name, new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF());
+                updateWarps();
+            } else if (i == 2) {
                 set.setWarp(p, name,
-                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[1])));
+                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])));
+                updateWarps();
             }
         }
-        if(subchannel.equals("DelWarp")){
+        if (subchannel.equals("DelWarp")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null){
+            if (p == null) {
                 return;
             }
             Delete delete = new Delete();
             delete.deleteWarp(p, in.readUTF());
+            updateWarps();
         }
+    }
+
+    private void updateWarps(){
+        Warp w = new Warp();
+        StringBuilder warps = new StringBuilder();
+        w.all().forEach(warp -> warps.append(warp.getName()).append(":"));
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("ListWarpsForPlayers");
+        out.writeUTF(warps.toString());
+        getProxy().getPlayers().forEach(p -> p.getServer().sendData("BungeeCord", out.toByteArray()));
     }
 }
