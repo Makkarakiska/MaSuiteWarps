@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class List {
 
-    public void listWarp(ProxiedPlayer p){
+    public void listWarp(ProxiedPlayer p) {
         Warp w = new Warp();
         Formator formator = new Formator();
         Configuration config = new Configuration();
@@ -81,7 +81,7 @@ public class List {
         if (p.hasPermission("masuitewarps.list.hidden")) {
             p.sendMessage(hidden);
         }
-        if(!p.hasPermission("masuitewarps.list.global") || !p.hasPermission("masuitewarps.list.server") || !p.hasPermission("masuitewarps.list.hiddenn")){
+        if (!p.hasPermission("masuitewarps.list.global") && !p.hasPermission("masuitewarps.list.server") && !p.hasPermission("masuitewarps.list.hidden")) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
         }
     }

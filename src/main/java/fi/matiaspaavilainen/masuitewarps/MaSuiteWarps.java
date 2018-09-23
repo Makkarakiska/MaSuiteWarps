@@ -11,9 +11,9 @@ import fi.matiaspaavilainen.masuitewarps.commands.List;
 import fi.matiaspaavilainen.masuitewarps.commands.Set;
 import fi.matiaspaavilainen.masuitewarps.commands.Teleport;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -21,11 +21,11 @@ import net.md_5.bungee.event.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
-    public static Database db = new Database();
+    static Database db = new Database();
 
     @Override
     public void onEnable() {
@@ -40,25 +40,11 @@ public class MaSuiteWarps extends Plugin implements Listener {
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         new Updator().checkVersion(this.getDescription(), "60454");
+        updateWarps();
     }
 
-    public void onDisable(){
+    public void onDisable() {
         db.hikari.close();
-    }
-
-    @EventHandler
-    public void onJoin(PostLoginEvent e) {
-        getProxy().getScheduler().schedule(this, () -> {
-            Warp w = new Warp();
-            StringBuilder warps = new StringBuilder();
-            w.all().forEach(warp -> warps.append(warp.getName()).append(":"));
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF("ListWarpsForPlayers");
-            out.writeUTF(warps.toString());
-            e.getPlayer().getServer().sendData("BungeeCord", out.toByteArray());
-        }, 200, TimeUnit.MILLISECONDS);
-
-
     }
 
     @EventHandler
@@ -77,6 +63,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             list.listWarp(p);
         }
         if (subchannel.equals("WarpSign")) {
+
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
             if (p == null) {
                 return;
@@ -85,6 +72,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport();
             teleport.warp(p, warp, "sign");
+            sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
@@ -95,6 +83,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport();
             teleport.warp(p, warp, "command");
+            sendCooldown(p);
         }
         if (subchannel.equals("WarpPlayerCommand")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
@@ -134,15 +123,40 @@ public class MaSuiteWarps extends Plugin implements Listener {
             delete.deleteWarp(p, in.readUTF());
             updateWarps();
         }
+        if(subchannel.equals("RequestWarps")){
+            updateWarps();
+        }
     }
 
-    private void updateWarps(){
+    private void updateWarps() {
         Warp w = new Warp();
         StringBuilder warps = new StringBuilder();
         w.all().forEach(warp -> warps.append(warp.getName()).append(":"));
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("ListWarpsForPlayers");
         out.writeUTF(warps.toString());
-        getProxy().getPlayers().forEach(p -> p.getServer().sendData("BungeeCord", out.toByteArray()));
+        for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
+            ServerInfo serverInfo = entry.getValue();
+            serverInfo.ping((result, error) -> {
+                if (error != null) {
+                } else {
+                    serverInfo.sendData("BungeeCord", out.toByteArray());
+                }
+            });
+        }
+    }
+
+    private void sendCooldown(ProxiedPlayer p) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("WarpCooldown");
+        out.writeUTF(String.valueOf(p.getUniqueId()));
+        try {
+            Thread.sleep(200);
+            out.writeLong(System.currentTimeMillis());
+            p.getServer().sendData("BungeeCord", out.toByteArray());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }
