@@ -4,62 +4,17 @@ import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitewarps.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.Warp;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class Teleport extends Command {
-
-    public Teleport() {
-        super("warpaa", "masuitewarps.warp", "warptaao");
-    }
+public class Teleport {
     private Formator formator = new Formator();
     private Configuration config = new Configuration();
-    @Override
-    public void execute(CommandSender cs, String[] args) {
-        if (!(cs instanceof ProxiedPlayer)) {
-            return;
-        }
-        ProxiedPlayer p = (ProxiedPlayer) cs;
-
-        if (args.length == 1) {
-            Warp warp = new Warp();
-            warp = warp.find(args[0]);
-            warp(p, warp, "command");
-        } else if (args.length == 2) {
-            if (p.hasPermission("masuitewarps.warp.others")) {
-                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);
-                if (target == null) {
-                    cs.sendMessage(new TextComponent(formator.colorize(config.load(null, "messages.yml").getString("player-not-online"))));
-                    return;
-                }
-                Warp warp = new Warp();
-                warp = warp.find(args[0]);
-                if (warp.getServer() == null) {
-                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
-                    return;
-                }
-                if (!warp.isGlobal()) {
-                    if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                        formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
-                        return;
-                    }
-
-                }
-                warp(target, warp, "command");
-            }
-        } else {
-            formator.sendMessage(p, config.load("warps", "syntax.yml").getString("warp.teleport"));
-        }
-
-    }
 
     public void warp(ProxiedPlayer p, Warp warp, String type) {
         if(!p.hasPermission("masuitewarps.warp")){

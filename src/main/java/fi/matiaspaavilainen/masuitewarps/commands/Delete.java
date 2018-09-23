@@ -27,6 +27,5 @@ public class Delete{
         } else {
             formator.sendMessage(p, "&cAn error occured. Please check console for more details");
         }
-        //formator.sendMessage(p, config.load("warps", "syntax.yml").getString("warp.delete"));
     }
 }

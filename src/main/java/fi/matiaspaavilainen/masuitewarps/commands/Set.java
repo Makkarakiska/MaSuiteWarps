@@ -55,7 +55,6 @@ public class Set {
         } else if (type.equalsIgnoreCase("global")) {
             global = !global;
         } else {
-            formator.sendMessage(p, config.load("warps", "syntax.yml").getString("warp.set"));
             return;
         }
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), hidden, global);
