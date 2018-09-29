@@ -86,14 +86,11 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
         if (subchannel.equals("WarpPlayerCommand")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if (p == null || sender == null) {
-                return;
-            }
+            String s = in.readUTF();
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport();
-            teleport.warp(p, sender, warp, "command");
+            teleport.warp(p, s, warp, "command");
         }
         if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
