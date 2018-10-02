@@ -8,6 +8,7 @@
     <artifactId>MaSuiteWarps</artifactId>
     <version>1.4.1</version>
     <build>
+        <finalName>MaSuiteWarps</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
