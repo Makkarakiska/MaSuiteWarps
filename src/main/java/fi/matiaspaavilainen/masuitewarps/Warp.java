@@ -2,7 +2,7 @@ package fi.matiaspaavilainen.masuitewarps;
 
 import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitewarps.database.Database;
+import fi.matiaspaavilainen.masuitecore.database.Database;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
 
 import java.sql.Connection;
@@ -168,7 +168,7 @@ public class Warp {
         ResultSet rs = null;
 
         try {
-            connection = MaSuiteCore.db.hikari.getConnection();
+            connection = db.hikari.getConnection();
             statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "warps;");
             rs = statement.executeQuery();
             while (rs.next()) {
