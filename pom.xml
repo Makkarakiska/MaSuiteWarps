@@ -9,7 +9,6 @@
     <version>1.4.2</version>
     <build>
         <finalName>MaSuiteWarps</finalName>
-        <defaultGoal>clean compile assembly:single</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
