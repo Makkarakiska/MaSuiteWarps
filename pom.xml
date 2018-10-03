@@ -6,7 +6,7 @@
 
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteWarps</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
     <build>
         <finalName>MaSuiteWarps</finalName>
         <defaultGoal>clean compile assembly:single</defaultGoal>
