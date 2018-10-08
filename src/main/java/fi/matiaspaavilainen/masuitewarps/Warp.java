@@ -80,6 +80,13 @@ public class Warp {
                     e1.printStackTrace();
                 }
             }
+            if(statement != null){
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
