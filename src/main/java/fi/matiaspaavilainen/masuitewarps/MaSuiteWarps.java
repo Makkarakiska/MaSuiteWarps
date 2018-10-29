@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
@@ -37,8 +38,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
         db.connect();
         db.createTable("warps",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-        new Updator().checkVersion(this.getDescription(), "60454");
+        new Updator().checkVersion(getDescription(), "60454");
         updateWarps();
     }
 
@@ -54,34 +54,36 @@ public class MaSuiteWarps extends Plugin implements Listener {
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
         if (subchannel.equals("ListWarps")) {
+            String types = in.readUTF();
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
             List list = new List();
-            list.listWarp(p);
+            list.listWarp(p, types);
         }
         if (subchannel.equals("WarpSign")) {
-
+            String permissions = in.readUTF();
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
-            Teleport teleport = new Teleport();
-            teleport.warp(p, warp, "sign");
+            Teleport teleport = new Teleport(this);
+            teleport.warp(p, warp, "sign", permissions);
             sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
+            String permissions = in.readUTF();
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
-            Teleport teleport = new Teleport();
-            teleport.warp(p, warp, "command");
+            Teleport teleport = new Teleport(this);
+            teleport.warp(p, warp, "command", permissions);
             sendCooldown(p);
         }
         if (subchannel.equals("WarpPlayerCommand")) {
@@ -89,7 +91,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             String s = in.readUTF();
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
-            Teleport teleport = new Teleport();
+            Teleport teleport = new Teleport(this);
             teleport.warp(p, s, warp, "command");
         }
         if (subchannel.equals("SetWarp")) {
@@ -119,7 +121,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             delete.deleteWarp(p, in.readUTF());
             updateWarps();
         }
-        if(subchannel.equals("RequestWarps")){
+        if (subchannel.equals("RequestWarps")) {
             updateWarps();
         }
     }
@@ -144,14 +146,8 @@ public class MaSuiteWarps extends Plugin implements Listener {
     private void sendCooldown(ProxiedPlayer p) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("WarpCooldown");
-        out.writeUTF(String.valueOf(p.getUniqueId()));
-        try {
-            Thread.sleep(200);
-            out.writeLong(System.currentTimeMillis());
-            p.getServer().sendData("BungeeCord", out.toByteArray());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        out.writeUTF(p.getUniqueId().toString());
+        out.writeLong(System.currentTimeMillis());
+        ProxyServer.getInstance().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", out.toByteArray()), 500, TimeUnit.MILLISECONDS);
     }
 }

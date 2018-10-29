@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class List {
 
-    public void listWarp(ProxiedPlayer p) {
+    public void listWarp(ProxiedPlayer p, String permissions) {
         Warp w = new Warp();
         Formator formator = new Formator();
         Configuration config = new Configuration();
@@ -28,7 +28,7 @@ public class List {
         int i = 0;
         String split = formator.colorize(config.load("warps", "messages.yml").getString("warp.split"));
         for (Warp warp : warps) {
-            if (warp.isGlobal() && warp.isHidden().equals(false)) {
+            if (warp.isGlobal() && !warp.isHidden()) {
                 if (i++ == warps.size() - 1) {
                     TextComponent hc = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.name").replace("%warp%", warp.getName())));
                     hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
@@ -42,7 +42,7 @@ public class List {
                     global.addExtra(split);
                 }
             }
-            if (warp.isGlobal().equals(false) && warp.getServer().equals(p.getServer().getInfo().getName()) && warp.isHidden().equals(false)) {
+            if (!warp.isGlobal() && warp.getServer().equals(p.getServer().getInfo().getName()) && !warp.isHidden()) {
                 if (i++ == warps.size() - 1) {
                     TextComponent hc = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.name").replace("%warp%", warp.getName())));
                     hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
@@ -72,17 +72,14 @@ public class List {
             }
         }
 
-        if (p.hasPermission("masuitewarps.list.global")) {
+        if (permissions.contains("GLOBAL")) {
             p.sendMessage(global);
         }
-        if (p.hasPermission("masuitewarps.list.server")) {
+        if (permissions.contains("SERVER")) {
             p.sendMessage(server);
         }
-        if (p.hasPermission("masuitewarps.list.hidden")) {
+        if (permissions.contains("HIDDEN")) {
             p.sendMessage(hidden);
-        }
-        if (!p.hasPermission("masuitewarps.list.global") && !p.hasPermission("masuitewarps.list.server") && !p.hasPermission("masuitewarps.list.hidden")) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
         }
     }
 }

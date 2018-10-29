@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.commands;
 
+import fi.matiaspaavilainen.masuitecore.Utils;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitewarps.MaSuiteWarps;
@@ -15,38 +16,27 @@ import java.util.concurrent.TimeUnit;
 public class Teleport {
     private Formator formator = new Formator();
     private Configuration config = new Configuration();
+    private Utils utils = new Utils();
+    private MaSuiteWarps plugin;
+    public Teleport(MaSuiteWarps p){
+        plugin = p;
+    }
 
-    public void warp(ProxiedPlayer p, Warp warp, String type) {
-        if (!p.hasPermission("masuitewarps.warp")) {
+    public void warp(ProxiedPlayer p, Warp warp, String type, String permissions) {
+        if (check(p, warp, p)) return;
+        if(warp.isHidden() && !permissions.contains("HIDDEN")){
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
             return;
         }
-
-        if (warp.getServer() == null) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
-            return;
-        }
-        if (config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission")) {
-            if (!p.hasPermission("masuitewarps.warp.to." + warp.getName().toLowerCase()) && !p.hasPermission("masuitewarps.warp.to.*")) {
+        if(type.equals("sign")){
+            if(warp.isGlobal() && !permissions.contains("GLOBAL")){
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
-        }
-
-        if (!warp.isGlobal()) {
-            if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
+            if(!warp.isGlobal() && !permissions.contains("SERVER")){
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
-
-        }
-        if (type.equals("sign") && (!p.hasPermission("masuitewarps.warp.hidden.sign.use") || !p.hasPermission("masuitewarps.warp.global.sign.use") || !p.hasPermission("masuitewarps.warp.server.sign.use"))) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-            return;
-        }
-        if (type.equals("command") && warp.isHidden() && !p.hasPermission("masuitewarps.warp.hidden")) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-            return;
         }
         warpPlayer(p, warp);
     }
@@ -57,39 +47,34 @@ public class Teleport {
             if (sender == null) {
                 return;
             }
-            if (!sender.hasPermission("masuitewarps.warp.others")) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-                return;
+            if(utils.isOnline(p, sender)){
+                if (check(p, warp, sender)) return;
             }
 
-            if (warp.getServer() == null) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
-                return;
-            }
-            if (config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission")) {
-                if (!sender.hasPermission("masuitewarps.warp.to." + warp.getName().toLowerCase()) && !sender.hasPermission("masuitewarps.warp.to.*")) {
-                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-                    return;
-                }
-            }
-
-            if (!warp.isGlobal()) {
-                if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
-                    return;
-                }
-
-            }
-            if (type.equals("sign") && (!sender.hasPermission("masuitewarps.warp.hidden.sign.use") || !sender.hasPermission("masuitewarps.warp.global.sign.use") || !sender.hasPermission("masuitewarps.warp.server.sign.use"))) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-                return;
-            }
-            if (type.equals("command") && warp.isHidden() && !sender.hasPermission("masuitewarps.warp.hidden")) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-                return;
-            }
         }
         warpPlayer(p, warp);
+    }
+
+    private boolean check(ProxiedPlayer p, Warp warp, ProxiedPlayer sender) {
+        if (warp.getServer() == null) {
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+            return true;
+        }
+        if (config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission")) {
+            if (!sender.hasPermission("masuitewarps.warp.to." + warp.getName().toLowerCase()) && !sender.hasPermission("masuitewarps.warp.to.*")) {
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+                return true;
+            }
+        }
+
+        if (!warp.isGlobal()) {
+            if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
+                return true;
+            }
+
+        }
+        return false;
     }
 
     private void warpPlayer(ProxiedPlayer p, Warp warp) {
@@ -109,7 +94,7 @@ public class Teleport {
             out.writeFloat(warp.getLocation().getPitch());
             final Warp wp = warp;
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                ProxyServer.getInstance().getScheduler().schedule(new MaSuiteWarps(), () -> ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
             } else {
                 ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray());
             }

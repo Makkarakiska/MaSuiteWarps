@@ -6,7 +6,7 @@
 
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteWarps</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
     <build>
         <finalName>MaSuiteWarps</finalName>
         <plugins>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.github.masagameplay</groupId>
             <artifactId>masuitecore</artifactId>
-            <version>2afdf4ce37</version>
+            <version>9b7c56dbd7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
