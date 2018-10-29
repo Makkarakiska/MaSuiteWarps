@@ -7,15 +7,11 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-public class Delete{
+public class Delete {
 
     public void deleteWarp(ProxiedPlayer p, String name) {
         Formator formator = new Formator();
         Configuration config = new Configuration();
-        if (!p.hasPermission("masuitewarps.delwarp")) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-            return;
-        }
         Warp warp = new Warp();
         warp = warp.find(name);
         if (warp.getServer() == null) {

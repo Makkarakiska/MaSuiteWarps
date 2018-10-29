@@ -13,25 +13,12 @@ public class Set {
 
 
     public void setWarp(ProxiedPlayer p, String name, Location loc) {
-        if(!p.hasPermission("masuitewarps.setwarp")){
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-            return;
-        }
         Warp wp = new Warp();
         wp = wp.find(name);
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc, false, true);
-        warp.create(warp);
-        if (wp.getServer() != null) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
-        } else {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
-        }
+        create(p, wp, warp);
     }
     public void setWarp(ProxiedPlayer p, String name, Location loc, String type) {
-        if(!p.hasPermission("masuitewarps.setwarp")){
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
-            return;
-        }
         Warp wp = new Warp();
         wp = wp.find(name);
         boolean hidden = false;
@@ -49,6 +36,10 @@ public class Set {
             return;
         }
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc, hidden, global);
+        create(p, wp, warp);
+    }
+
+    private void create(ProxiedPlayer p, Warp wp, Warp warp) {
         warp.create(warp);
         if (wp.getServer() != null) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
