@@ -1,15 +1,13 @@
 package fi.matiaspaavilainen.masuitewarps;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitewarps.database.Database;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuitewarps.commands.Delete;
 import fi.matiaspaavilainen.masuitewarps.commands.List;
 import fi.matiaspaavilainen.masuitewarps.commands.Set;
 import fi.matiaspaavilainen.masuitewarps.commands.Teleport;
+import fi.matiaspaavilainen.masuitewarps.database.Database;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -18,9 +16,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -130,24 +126,32 @@ public class MaSuiteWarps extends Plugin implements Listener {
         Warp w = new Warp();
         StringBuilder warps = new StringBuilder();
         w.all().forEach(warp -> warps.append(warp.getName()).append(":"));
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("ListWarpsForPlayers");
-        out.writeUTF(warps.toString());
-        for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
-            ServerInfo serverInfo = entry.getValue();
-            serverInfo.ping((result, error) -> {
-                if (error == null) {
-                    serverInfo.sendData("BungeeCord", out.toByteArray());
-                }
-            });
+        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
+             DataOutputStream out = new DataOutputStream(b)) {
+            out.writeUTF("ListWarpsForPlayers");
+            out.writeUTF(warps.toString());
+            for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
+                ServerInfo serverInfo = entry.getValue();
+                serverInfo.ping((result, error) -> {
+                    if (error == null) {
+                        serverInfo.sendData("BungeeCord", b.toByteArray());
+                    }
+                });
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void sendCooldown(ProxiedPlayer p) {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("WarpCooldown");
-        out.writeUTF(p.getUniqueId().toString());
-        out.writeLong(System.currentTimeMillis());
-        ProxyServer.getInstance().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", out.toByteArray()), 500, TimeUnit.MILLISECONDS);
+        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
+             DataOutputStream out = new DataOutputStream(b)) {
+            out.writeUTF("WarpCooldown");
+            out.writeUTF(p.getUniqueId().toString());
+            out.writeLong(System.currentTimeMillis());
+            ProxyServer.getInstance().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

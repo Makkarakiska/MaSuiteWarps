@@ -1,5 +1,5 @@
 name: MaSuiteWarps
 main: fi.matiaspaavilainen.masuitewarps.MaSuiteWarps
-version: 1.4.3.1
+version: 1.4.3.2
 author: Masagameplay
 depends: [MaSuiteCore]

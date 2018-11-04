@@ -18,22 +18,23 @@ public class Teleport {
     private Configuration config = new Configuration();
     private Utils utils = new Utils();
     private MaSuiteWarps plugin;
-    public Teleport(MaSuiteWarps p){
+
+    public Teleport(MaSuiteWarps p) {
         plugin = p;
     }
 
     public void warp(ProxiedPlayer p, Warp warp, String type, String permissions) {
         if (check(p, warp, p)) return;
-        if(warp.isHidden() && !permissions.contains("HIDDEN")){
+        if (warp.isHidden() && !permissions.contains("HIDDEN")) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
             return;
         }
-        if(type.equals("sign")){
-            if(warp.isGlobal() && !permissions.contains("GLOBAL")){
+        if (type.equals("sign")) {
+            if (warp.isGlobal() && !permissions.contains("GLOBAL")) {
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
-            if(!warp.isGlobal() && !permissions.contains("SERVER")){
+            if (!warp.isGlobal() && !permissions.contains("SERVER")) {
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
@@ -47,12 +48,14 @@ public class Teleport {
             if (sender == null) {
                 return;
             }
-            if(utils.isOnline(p, sender)){
+            if (utils.isOnline(p, sender)) {
                 if (check(p, warp, sender)) return;
             }
-
         }
-        warpPlayer(p, warp);
+        if (utils.isOnline(p)) {
+            warpPlayer(p, warp);
+        }
+
     }
 
     private boolean check(ProxiedPlayer p, Warp warp, ProxiedPlayer sender) {
@@ -78,25 +81,24 @@ public class Teleport {
     }
 
     private void warpPlayer(ProxiedPlayer p, Warp warp) {
-        try {
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(b);
+        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
+             DataOutputStream out = new DataOutputStream(b)) {
+
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
                 p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
             }
             out.writeUTF("WarpPlayer");
-            out.writeUTF(String.valueOf(p.getUniqueId()));
-            out.writeUTF(warp.getLocation().getWorld());
-            out.writeDouble(warp.getLocation().getX());
-            out.writeDouble(warp.getLocation().getY());
-            out.writeDouble(warp.getLocation().getZ());
-            out.writeFloat(warp.getLocation().getYaw());
-            out.writeFloat(warp.getLocation().getPitch());
-            final Warp wp = warp;
+            out.writeUTF(p.getUniqueId().toString());
+            out.writeUTF(warp.getLocation().getWorld()
+                    + ":" + warp.getLocation().getX()
+                    + ":" + warp.getLocation().getY()
+                    + ":" + warp.getLocation().getZ()
+                    + ":" + warp.getLocation().getYaw()
+                    + ":" + warp.getLocation().getPitch());
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
             } else {
-                ProxyServer.getInstance().getServerInfo(wp.getServer()).sendData("BungeeCord", b.toByteArray());
+                p.getServer().sendData("BungeeCord", b.toByteArray());
             }
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
         } catch (IOException e) {
