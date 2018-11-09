@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps;
 
+import fi.matiaspaavilainen.masuitecore.Debugger;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class MaSuiteWarps extends Plugin implements Listener {
 
     static Database db = new Database();
-
+    private Debugger debugger = new Debugger();
     @Override
     public void onEnable() {
         super.onEnable();
@@ -57,6 +58,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             List list = new List();
             list.listWarp(p, types);
+            debugger.sendMessage("[MaSuite] [Warps] Listed warps for " + p.getName());
         }
         if (subchannel.equals("WarpSign")) {
             String permissions = in.readUTF();
@@ -68,6 +70,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
             teleport.warp(p, warp, "sign", permissions);
+            debugger.sendMessage("[MaSuite] [Warps] [WarpSign] Warping " + p.getName());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
@@ -76,10 +79,12 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (p == null) {
                 return;
             }
+
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
             teleport.warp(p, warp, "command", permissions);
+            debugger.sendMessage("[MaSuite] [Warps] [WarpCommand] Warping " + p.getName());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpPlayerCommand")) {
@@ -89,6 +94,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
             teleport.warp(p, s, warp, "command");
+            debugger.sendMessage("[MaSuite] [Warps] [WarpPlayerCommand] Warping " + p.getName());
         }
         if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
@@ -107,6 +113,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
                         new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])));
                 updateWarps();
             }
+            debugger.sendMessage("[MaSuite] [Warps] Set warp");
         }
         if (subchannel.equals("DelWarp")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
@@ -116,6 +123,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Delete delete = new Delete();
             delete.deleteWarp(p, in.readUTF());
             updateWarps();
+            debugger.sendMessage("[MaSuite] [Warps] Deleted warp");
         }
         if (subchannel.equals("RequestWarps")) {
             updateWarps();
@@ -135,6 +143,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
                 serverInfo.ping((result, error) -> {
                     if (error == null) {
                         serverInfo.sendData("BungeeCord", b.toByteArray());
+                        debugger.sendMessage("[MaSuite] [Warps] Sent list of warp");
                     }
                 });
             }
@@ -150,6 +159,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             out.writeUTF(p.getUniqueId().toString());
             out.writeLong(System.currentTimeMillis());
             ProxyServer.getInstance().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+            debugger.sendMessage("[MaSuite] [Warps] Sent cooldown to" + p.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }

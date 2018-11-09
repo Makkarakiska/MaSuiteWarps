@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.commands;
 
+import fi.matiaspaavilainen.masuitecore.Debugger;
 import fi.matiaspaavilainen.masuitecore.Utils;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
@@ -18,6 +19,7 @@ public class Teleport {
     private Configuration config = new Configuration();
     private Utils utils = new Utils();
     private MaSuiteWarps plugin;
+    private Debugger debugger = new Debugger();
 
     public Teleport(MaSuiteWarps p) {
         plugin = p;
@@ -26,15 +28,18 @@ public class Teleport {
     public void warp(ProxiedPlayer p, Warp warp, String type, String permissions) {
         if (check(p, warp, p)) return;
         if (warp.isHidden() && !permissions.contains("HIDDEN")) {
+            debugger.sendMessage("[MaSuite] [Warps] Player " + p.getName() + " doesn't have permission to hidden warps.");
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
             return;
         }
         if (type.equals("sign")) {
             if (warp.isGlobal() && !permissions.contains("GLOBAL")) {
+                debugger.sendMessage("[MaSuite] [Warps] Player " + p.getName() + " doesn't have permission to global sign warps.");
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
             if (!warp.isGlobal() && !permissions.contains("SERVER")) {
+                debugger.sendMessage("[MaSuite] [Warps] Player " + p.getName() + " doesn't have permission to server sign warps.");
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
@@ -55,7 +60,6 @@ public class Teleport {
         if (utils.isOnline(p)) {
             warpPlayer(p, warp);
         }
-
     }
 
     private boolean check(ProxiedPlayer p, Warp warp, ProxiedPlayer sender) {
@@ -69,13 +73,11 @@ public class Teleport {
                 return true;
             }
         }
-
         if (!warp.isGlobal()) {
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
                 return true;
             }
-
         }
         return false;
     }
@@ -83,10 +85,6 @@ public class Teleport {
     private void warpPlayer(ProxiedPlayer p, Warp warp) {
         try (ByteArrayOutputStream b = new ByteArrayOutputStream();
              DataOutputStream out = new DataOutputStream(b)) {
-
-            if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
-            }
             out.writeUTF("WarpPlayer");
             out.writeUTF(p.getUniqueId().toString());
             out.writeUTF(warp.getLocation().getWorld()
@@ -96,13 +94,17 @@ public class Teleport {
                     + ":" + warp.getLocation().getYaw()
                     + ":" + warp.getLocation().getPitch());
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
+                debugger.sendMessage("[MaSuite] [Warps] Player and player are not in the same server. Connecting...");
+                p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
                 ProxyServer.getInstance().getScheduler().schedule(plugin, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+                debugger.sendMessage("[MaSuite] [Warps] Player has been teleported");
             } else {
                 p.getServer().sendData("BungeeCord", b.toByteArray());
+                debugger.sendMessage("[MaSuite] [Warps] Player has been teleported");
             }
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.getStackTrace();
         }
     }
 }
