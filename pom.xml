@@ -64,6 +64,7 @@
             <groupId>com.github.masagameplay</groupId>
             <artifactId>masuitecore</artifactId>
             <version>9b7c56dbd7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
