@@ -133,7 +133,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
     private void updateWarps() {
         Warp w = new Warp();
         StringBuilder warps = new StringBuilder();
-        w.all().forEach(warp -> warps.append(warp.getName()).append(":"));
+        w.all().forEach(warp -> warps.append(warp.getName()).append(":").append(warp.isGlobal().toString()).append(":").append(warp.isHidden().toString()).append("::"));
         try (ByteArrayOutputStream b = new ByteArrayOutputStream();
              DataOutputStream out = new DataOutputStream(b)) {
             out.writeUTF("ListWarpsForPlayers");
