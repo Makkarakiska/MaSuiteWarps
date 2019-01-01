@@ -1,0 +1,1 @@
+enable-per-warp-permission: true #SetCommand this to false to disable per warp permission
