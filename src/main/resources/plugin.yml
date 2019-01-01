@@ -1,5 +1,20 @@
 name: MaSuiteWarps
-main: fi.matiaspaavilainen.masuitewarps.MaSuiteWarps
-version: 1.4.6
+main: fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps
+version: ${project.version}
 author: Masagameplay
-depends: [MaSuiteCore]
+commands:
+  warp:
+    description: Warps player to specified location
+    aliases: [warpto]
+    permission: masuitewarps.warp
+  setwarp:
+    description: Creates warp point
+    aliases: [warpset, createwarp]
+    permission: masuitewarps.setwarp
+  delwarp:
+    description: Deletes warp point
+    aliases: [warpdel, deletewarp]
+    permission: masuitewarps.delwarp
+  warps:
+    description: Lists all available warps
+    aliases: [listwarps, warplist]
