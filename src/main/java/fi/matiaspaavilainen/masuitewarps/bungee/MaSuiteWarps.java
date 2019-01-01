@@ -1,20 +1,20 @@
-package fi.matiaspaavilainen.masuitewarps;
+package fi.matiaspaavilainen.masuitewarps.bungee;
 
-import fi.matiaspaavilainen.masuitecore.Debugger;
-import fi.matiaspaavilainen.masuitecore.Updator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitecore.managers.Location;
-import fi.matiaspaavilainen.masuitewarps.commands.Delete;
-import fi.matiaspaavilainen.masuitewarps.commands.List;
-import fi.matiaspaavilainen.masuitewarps.commands.Set;
-import fi.matiaspaavilainen.masuitewarps.commands.Teleport;
-import fi.matiaspaavilainen.masuitewarps.database.Database;
+import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuitewarps.bungee.commands.Delete;
+import fi.matiaspaavilainen.masuitewarps.bungee.commands.List;
+import fi.matiaspaavilainen.masuitewarps.bungee.commands.Set;
+import fi.matiaspaavilainen.masuitewarps.bungee.commands.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
@@ -23,24 +23,32 @@ import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
-    static Database db = new Database();
-    private Debugger debugger = new Debugger();
+    static ConnectionManager cm = null;
+
     @Override
     public void onEnable() {
-        super.onEnable();
-        Configuration config = new Configuration();
+        // Configuration
+        BungeeConfiguration config = new BungeeConfiguration();
         config.create(this, "warps", "messages.yml");
         config.create(this, "warps", "settings.yml");
         getProxy().getPluginManager().registerListener(this, this);
-        db.connect();
-        db.createTable("warps",
+
+        // Database
+        Configuration dbInfo = config.load(null, "config.yml");
+        cm = new ConnectionManager(dbInfo.getString("database.table-prefix"), dbInfo.getString("database.address"), dbInfo.getInt("database.port"), dbInfo.getString("database.name"), dbInfo.getString("database.username"), dbInfo.getString("database.password"));
+        cm.connect();
+        cm.getDatabase().createTable("warps",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-        new Updator().checkVersion(getDescription(), "60454");
+
+        // Send list of warp
         updateWarps();
+
+        // Updator
+        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60454"}).checkUpdates();
     }
 
     public void onDisable() {
-        db.hikari.close();
+        cm.close();
     }
 
     @EventHandler
@@ -58,7 +66,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             List list = new List();
             list.listWarp(p, types);
-            debugger.sendMessage("[MaSuite] [Warps] Listed warps for " + p.getName());
         }
         if (subchannel.equals("WarpSign")) {
             String permissions = in.readUTF();
@@ -70,7 +77,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
             teleport.warp(p, warp, "sign", permissions);
-            debugger.sendMessage("[MaSuite] [Warps] [WarpSign] Warping " + p.getName());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
@@ -84,7 +90,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
             teleport.warp(p, warp, "command", permissions);
-            debugger.sendMessage("[MaSuite] [Warps] [WarpCommand] Warping " + p.getName());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpPlayerCommand")) {
@@ -94,7 +99,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
             teleport.warp(p, s, warp, "command");
-            debugger.sendMessage("[MaSuite] [Warps] [WarpPlayerCommand] Warping " + p.getName());
         }
         if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
@@ -113,7 +117,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
                         new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])));
                 updateWarps();
             }
-            debugger.sendMessage("[MaSuite] [Warps] Set warp");
         }
         if (subchannel.equals("DelWarp")) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
@@ -123,7 +126,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Delete delete = new Delete();
             delete.deleteWarp(p, in.readUTF());
             updateWarps();
-            debugger.sendMessage("[MaSuite] [Warps] Deleted warp");
         }
         if (subchannel.equals("RequestWarps")) {
             updateWarps();
@@ -143,7 +145,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
                 serverInfo.ping((result, error) -> {
                     if (error == null) {
                         serverInfo.sendData("BungeeCord", b.toByteArray());
-                        debugger.sendMessage("[MaSuite] [Warps] Sent list of warp");
                     }
                 });
             }
@@ -159,7 +160,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             out.writeUTF(p.getUniqueId().toString());
             out.writeLong(System.currentTimeMillis());
             ProxyServer.getInstance().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
-            debugger.sendMessage("[MaSuite] [Warps] Sent cooldown to" + p.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
