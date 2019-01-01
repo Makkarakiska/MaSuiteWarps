@@ -1,25 +1,22 @@
-package fi.matiaspaavilainen.masuitewarps.commands;
+package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitewarps.Warp;
-import net.md_5.bungee.api.CommandSender;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuitewarps.bungee.Warp;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class List {
 
     public void listWarp(ProxiedPlayer p, String permissions) {
         Warp w = new Warp();
         Formator formator = new Formator();
-        Configuration config = new Configuration();
+        BungeeConfiguration config = new BungeeConfiguration();
         TextComponent global = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.global")));
         TextComponent server = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.server")));
         TextComponent hidden = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.hidden")));
@@ -46,7 +43,7 @@ public class List {
                 if (i++ == warps.size() - 1) {
                     TextComponent hc = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.name").replace("%warp%", warp.getName())));
                     hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(formator.colorize(config.load("warps", "messages.yml").getString("warp-hover-text").replace("%warp%", warp.getName()))).create()));
+                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(formator.colorize(config.load("warps", "bungee/messages.yml").getString("warp-hover-text").replace("%warp%", warp.getName()))).create()));
                     server.addExtra(hc);
                 } else {
                     TextComponent hc = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.name").replace("%warp%", warp.getName())));

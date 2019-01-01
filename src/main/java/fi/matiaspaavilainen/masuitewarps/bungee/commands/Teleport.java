@@ -1,11 +1,10 @@
-package fi.matiaspaavilainen.masuitewarps.commands;
+package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
-import fi.matiaspaavilainen.masuitecore.Debugger;
-import fi.matiaspaavilainen.masuitecore.Utils;
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitewarps.MaSuiteWarps;
-import fi.matiaspaavilainen.masuitewarps.Warp;
+import fi.matiaspaavilainen.masuitecore.bungee.Utils;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
+import fi.matiaspaavilainen.masuitewarps.bungee.Warp;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -16,10 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 public class Teleport {
     private Formator formator = new Formator();
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private Utils utils = new Utils();
     private MaSuiteWarps plugin;
-    private Debugger debugger = new Debugger();
 
     public Teleport(MaSuiteWarps p) {
         plugin = p;
@@ -28,18 +26,15 @@ public class Teleport {
     public void warp(ProxiedPlayer p, Warp warp, String type, String permissions) {
         if (check(p, warp, p)) return;
         if (warp.isHidden() && !permissions.contains("HIDDEN")) {
-            debugger.sendMessage("[MaSuite] [Warps] Player " + p.getName() + " doesn't have permission to hidden warps.");
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
             return;
         }
         if (type.equals("sign")) {
             if (warp.isGlobal() && !permissions.contains("GLOBAL")) {
-                debugger.sendMessage("[MaSuite] [Warps] Player " + p.getName() + " doesn't have permission to global sign warps.");
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
             if (!warp.isGlobal() && !permissions.contains("SERVER")) {
-                debugger.sendMessage("[MaSuite] [Warps] Player " + p.getName() + " doesn't have permission to server sign warps.");
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return;
             }
@@ -94,13 +89,10 @@ public class Teleport {
                     + ":" + warp.getLocation().getYaw()
                     + ":" + warp.getLocation().getPitch());
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                debugger.sendMessage("[MaSuite] [Warps] Player and player are not in the same server. Connecting...");
                 p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
                 ProxyServer.getInstance().getScheduler().schedule(plugin, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
-                debugger.sendMessage("[MaSuite] [Warps] Player has been teleported");
             } else {
                 p.getServer().sendData("BungeeCord", b.toByteArray());
-                debugger.sendMessage("[MaSuite] [Warps] Player has been teleported");
             }
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
         } catch (IOException e) {

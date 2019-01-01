@@ -1,14 +1,14 @@
-package fi.matiaspaavilainen.masuitewarps.commands;
+package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitecore.managers.Location;
-import fi.matiaspaavilainen.masuitewarps.Warp;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuitewarps.bungee.Warp;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class Set {
 
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private Formator formator = new Formator();
 
 
@@ -18,6 +18,7 @@ public class Set {
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc, false, true);
         create(p, wp, warp);
     }
+
     public void setWarp(ProxiedPlayer p, String name, Location loc, String type) {
         Warp wp = new Warp();
         wp = wp.find(name);
@@ -40,7 +41,7 @@ public class Set {
     }
 
     private void create(ProxiedPlayer p, Warp wp, Warp warp) {
-        warp.create(warp);
+        warp.create();
         if (wp.getServer() != null) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
         } else {
