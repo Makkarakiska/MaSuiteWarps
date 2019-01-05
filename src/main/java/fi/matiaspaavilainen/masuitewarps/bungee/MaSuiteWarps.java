@@ -14,7 +14,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
@@ -22,8 +21,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
-
-    static ConnectionManager cm = null;
 
     @Override
     public void onEnable() {
@@ -34,10 +31,8 @@ public class MaSuiteWarps extends Plugin implements Listener {
         getProxy().getPluginManager().registerListener(this, this);
 
         // Database
-        Configuration dbInfo = config.load(null, "config.yml");
-        cm = new ConnectionManager(dbInfo.getString("database.table-prefix"), dbInfo.getString("database.address"), dbInfo.getInt("database.port"), dbInfo.getString("database.name"), dbInfo.getString("database.username"), dbInfo.getString("database.password"));
-        cm.connect();
-        cm.getDatabase().createTable("warps",
+
+        ConnectionManager.db.createTable("warps",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Send list of warp
@@ -45,10 +40,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
         // Updator
         new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60454"}).checkUpdates();
-    }
-
-    public void onDisable() {
-        cm.close();
     }
 
     @EventHandler
