@@ -4,6 +4,7 @@ import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,10 +25,11 @@ public class Sign implements Listener {
     }
 
     private String[] formats() {
-        return new String[]{plugin.getConfig().getString("warp-sign.first"),
-                plugin.getConfig().getString("warp-sign.second"),
-                plugin.getConfig().getString("warp-sign.third"),
-                plugin.getConfig().getString("warp-sign.fourth")};
+        FileConfiguration fc = plugin.config.load("warps", "config.yml");
+        return new String[]{fc.getString("warp-sign.first"),
+                fc.getString("warp-sign.second"),
+                fc.getString("warp-sign.third"),
+                fc.getString("warp-sign.fourth")};
     }
 
     @EventHandler
