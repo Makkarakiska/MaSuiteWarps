@@ -11,7 +11,8 @@ import java.util.UUID;
 
 public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMessageListener {
 
-    WarpMessageListener(MaSuiteWarps p) { }
+    WarpMessageListener(MaSuiteWarps plugin) {
+    }
 
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
         if (!channel.equals("BungeeCord")) {
@@ -24,12 +25,12 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
             subchannel = in.readUTF();
             if (subchannel.equals("WarpPlayer")) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
-                if(p == null){
+                if (p == null) {
                     return;
                 }
                 String[] loc = in.readUTF().split(":");
-                if(Bukkit.getWorld(loc[0]) == null){
-                    System.out.println("[MaSuite] [Warps] [World=" + loc[0] +"] World  could not be found!");
+                if (Bukkit.getWorld(loc[0]) == null) {
+                    System.out.println("[MaSuite] [Warps] [World=" + loc[0] + "] World  could not be found!");
                     return;
                 }
                 p.teleport(new Location(Bukkit.getWorld(loc[0]),
@@ -42,7 +43,7 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
             if (subchannel.equals("ListWarpsForPlayers")) {
                 String w = in.readUTF().toLowerCase();
                 String[] warps = w.split("::");
-                for(String warp : warps){
+                for (String warp : warps) {
                     String[] info = warp.split(":");
                     MaSuiteWarps.warps.add(new Warp(info[0], Boolean.valueOf(info[1]), Boolean.valueOf(info[2])));
                     MaSuiteWarps.warpNames.add(info[0].toLowerCase());
@@ -50,18 +51,23 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
             }
             if (subchannel.equals("WarpCooldown")) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
-                if(p == null){
+                if (p == null) {
                     return;
                 }
                 MaSuiteWarps.cooldowns.put(p.getUniqueId(), in.readLong());
             }
-            if(subchannel.equals("DelWarp")){
+            if (subchannel.equals("DelWarp")) {
                 String w = in.readUTF();
                 MaSuiteWarps.warpNames.remove(w);
-                for(Warp warp : MaSuiteWarps.warps){
+                Warp foundWarp = null;
+                for (Warp warp : MaSuiteWarps.warps) {
                     if (warp.getName().equalsIgnoreCase(w)) {
-                        MaSuiteWarps.warps.remove(warp);
+                        foundWarp = warp;
+                        break;
                     }
+                }
+                if (foundWarp != null) {
+                    MaSuiteWarps.warps.remove(foundWarp);
                 }
             }
         } catch (IOException e) {
