@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
+import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,9 +11,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -65,16 +63,7 @@ public class Sign implements Listener {
                 if (p.hasPermission("masuitewarps.warp.sign.hidden")) {
                     types.add("HIDDEN");
                 }
-                try (ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                     DataOutputStream out = new DataOutputStream(bs)) {
-                    out.writeUTF("WarpSign");
-                    out.writeUTF(types.toString());
-                    out.writeUTF(p.getName());
-                    out.writeUTF(ChatColor.stripColor(sign.getLine(getWarpLine())));
-                    p.sendPluginMessage(plugin, "BungeeCord", bs.toByteArray());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                new PluginChannel(plugin, p, new Object[]{"WarpSign", types.toString(), p.getName(), ChatColor.stripColor(sign.getLine(getWarpLine()))}).send();
             }
 
         }
