@@ -2,6 +2,7 @@ package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.Countdown;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
@@ -10,10 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class TeleportCommand implements CommandExecutor {
 
@@ -31,7 +28,6 @@ public class TeleportCommand implements CommandExecutor {
         if (!(cs instanceof Player)) {
             return false;
         }
-
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
             if (plugin.checkCooldown(cs, plugin)) return;
@@ -44,7 +40,7 @@ public class TeleportCommand implements CommandExecutor {
                     if (checkCooldown(p)) {
                         if (plugin.getConfig().getInt("warmup") > 0) {
                             MaSuiteWarps.warmups.add(p.getUniqueId());
-                            formator.sendMessage((Player) cs, config.load("warps", "messages.yml").getString("teleportation-started").replace("%time%", String.valueOf(config.load("warps", "config.yml").getInt("warmup"))));
+                            formator.sendMessage(cs, config.load("warps", "messages.yml").getString("teleportation-started").replace("%time%", String.valueOf(config.load("warps", "config.yml").getInt("warmup"))));
                             new Countdown(config.load("warps", "config.yml").getInt("warmup"), plugin) {
                                 @Override
                                 public void count(int current) {
@@ -69,28 +65,19 @@ public class TeleportCommand implements CommandExecutor {
             } else if (args.length == 2) {
                 if (cs.hasPermission("masuitewarps.warp.others")) {
                     if (checkWarp(cs, args[0])) {
-                        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-                             DataOutputStream out = new DataOutputStream(b)) {
-                            out.writeUTF("WarpPlayerCommand");
-                            out.writeUTF(args[1]);
-                            out.writeUTF("console");
-                            out.writeUTF(args[0]);
-                            Player p = Bukkit.getPlayer(args[1]);
-                            if (p != null) {
-                                sendLastLoc(p);
-                                p.sendPluginMessage(plugin, "BungeeCord", b.toByteArray());
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        Player p = Bukkit.getPlayer(args[1]);
+                        if (p != null) {
+                            sendLastLoc(p);
+                            new PluginChannel(plugin, p, new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
                         }
                     }
                 } else {
-                    formator.sendMessage((Player) cs, config.load(null, "messages.yml").getString("no-permission"));
+                    formator.sendMessage(cs, config.load(null, "messages.yml").getString("no-permission"));
                     plugin.in_command.remove(cs);
                     return;
                 }
             } else {
-                formator.sendMessage((Player) cs, config.load("warps", "syntax.yml").getString("warp.teleport"));
+                formator.sendMessage(cs, config.load("warps", "syntax.yml").getString("warp.teleport"));
                 plugin.in_command.remove(cs);
                 return;
             }
@@ -103,27 +90,20 @@ public class TeleportCommand implements CommandExecutor {
 
     private void send(String[] args, Player p) {
         sendLastLoc(p);
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("WarpCommand");
-            if (p.hasPermission("masuitewarps.warp.hidden")) {
-                out.writeUTF("HIDDEN");
-            } else {
-                out.writeUTF("-------");
-            }
-            out.writeUTF(p.getName());
-            out.writeUTF(args[0]);
-            p.sendPluginMessage(plugin, "BungeeCord", b.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
+        String hidden;
+        if (p.hasPermission("masuitewarps.warp.hidden")) {
+            hidden = "HIDDEN";
+        } else {
+            hidden = "-------";
         }
+        new PluginChannel(plugin, p, new Object[]{"WarpCommand", hidden, p.getName(), args[0]}).send();
     }
 
     private Boolean checkWarp(CommandSender cs, String name) {
         if (MaSuiteWarps.warpNames.contains(name.toLowerCase())) {
             return true;
         } else {
-            formator.sendMessage((Player) cs, config.load("warps", "messages.yml").getString("warp-not-found"));
+            formator.sendMessage(cs, config.load("warps", "messages.yml").getString("warp-not-found"));
             return false;
         }
     }
@@ -146,18 +126,7 @@ public class TeleportCommand implements CommandExecutor {
     }
 
     private void sendLastLoc(Player p) {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("MaSuiteTeleports");
-            out.writeUTF("GetLocation");
-            out.writeUTF(p.getName());
-            Location loc = p.getLocation();
-            out.writeUTF(loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":"
-                    + loc.getYaw() + ":" + loc.getPitch());
-            out.writeUTF("DETECTSERVER");
-            p.sendPluginMessage(plugin, "BungeeCord", b.toByteArray());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        Location loc = p.getLocation();
+        new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "GetLocation", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
     }
 }

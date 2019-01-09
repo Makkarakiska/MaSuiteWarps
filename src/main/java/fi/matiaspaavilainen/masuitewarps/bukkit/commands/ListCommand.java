@@ -1,15 +1,12 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
+import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class ListCommand implements CommandExecutor {
 
@@ -31,15 +28,8 @@ public class ListCommand implements CommandExecutor {
 
             Player p = (Player) cs;
             if (args.length == 0) {
-                try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-                     DataOutputStream out = new DataOutputStream(b)) {
-                    out.writeUTF("ListWarps");
-                    out.writeUTF(plugin.checkPermissions(p));
-                    out.writeUTF(p.getName());
-                    p.sendPluginMessage(plugin, "BungeeCord", b.toByteArray());
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
+                new PluginChannel(plugin, p, new Object[]{"ListWarps", plugin.checkPermissions(p), p.getName()}).send();
+
             }
             plugin.in_command.remove(cs);
         });
