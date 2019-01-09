@@ -2,6 +2,7 @@ package fi.matiaspaavilainen.masuitewarps.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.DeleteCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.ListCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.SetCommand;
@@ -37,7 +38,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         // Create configs
         config.create(this, "warps", "config.yml");
         config.create(this, "warps", "messages.yml");
-        config.create(this, "warps", "config.yml");
+        config.create(this, "warps", "syntax.yml");
 
         // Register listeners
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -76,13 +77,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         if (warps.isEmpty()) {
-            try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-                 DataOutputStream out = new DataOutputStream(b)) {
-                out.writeUTF("RequestWarps");
-                getServer().getScheduler().runTaskLaterAsynchronously(this, () -> getServer().sendPluginMessage(this, "BungeeCord", b.toByteArray()), 100);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new PluginChannel(this, e.getPlayer(), new Object[]{"RequestWarps"}).send(), 100);
         }
     }
 
@@ -113,7 +108,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public boolean checkCooldown(CommandSender cs, MaSuiteWarps plugin) {
         if (plugin.in_command.contains(cs)) {
-            formator.sendMessage((Player) cs, config.load(null, "messages.yml").getString("on-active-command"));
+            formator.sendMessage(cs, config.load(null, "messages.yml").getString("on-active-command"));
             return true;
         }
 
