@@ -52,7 +52,7 @@ public class Sign implements Listener {
         }
         Player p = e.getPlayer();
         Block b = e.getClickedBlock();
-        if (b.getType() == Material.LEGACY_SIGN_POST || b.getType() == Material.WALL_SIGN) {
+        if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN) {
             org.bukkit.block.Sign sign = (org.bukkit.block.Sign) b.getState();
             if (checkSign(sign)) {
                 StringJoiner types = new StringJoiner("");

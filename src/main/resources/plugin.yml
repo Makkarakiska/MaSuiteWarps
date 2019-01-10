@@ -2,7 +2,7 @@ name: MaSuiteWarps
 main: fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps
 version: ${project.version}
 author: Masagameplay
-depend: [MaSuiteCore]
+depends: [MaSuiteCore]
 api-version: 1.13
 commands:
   warp:
