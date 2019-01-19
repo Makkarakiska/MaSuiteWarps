@@ -1,8 +1,8 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,15 +26,14 @@ public class SetCommand implements CommandExecutor {
         }
         Formator formator = new Formator();
         BukkitConfiguration config = new BukkitConfiguration();
+        if (plugin.checkCooldown(cs, plugin)) return false;
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-
-            if (plugin.checkCooldown(cs, plugin)) return;
 
             Player p = (Player) cs;
             Location loc = p.getLocation();
             String l = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
             if (args.length == 1) {
-                new PluginChannel(plugin, p, new Object[]{"SetWarp", 2, p.getName(), args[0], l}).send();
+                new BukkitPluginChannel(plugin, p, new Object[]{"SetWarp", 2, p.getName(), args[0], l}).send();
             } else if (args.length == 2) {
                 if (args[1].equalsIgnoreCase("hidden") || args[1].equalsIgnoreCase("global")) {
                     if (args[1].equalsIgnoreCase("hidden") && !p.hasPermission("masuitewarp.setwarp.hidden")) {
@@ -49,14 +48,13 @@ public class SetCommand implements CommandExecutor {
                         formator.sendMessage(cs, config.load(null, "messages.yml").getString("no-permission"));
                         return;
                     }
-                    new PluginChannel(plugin, p, new Object[]{"SetWarp", 3, p.getName(), args[0], l, args[1]}).send();
+                    new BukkitPluginChannel(plugin, p, new Object[]{"SetWarp", 3, p.getName(), args[0], l, args[1]}).send();
                 }
             } else {
                 formator.sendMessage(cs, config.load("warps", "syntax.yml").getString("warp.set"));
             }
+            plugin.in_command.remove(cs);
         });
-
-        plugin.in_command.remove(cs);
         return true;
     }
 

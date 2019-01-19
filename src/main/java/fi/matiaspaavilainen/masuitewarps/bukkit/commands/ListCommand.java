@@ -1,6 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -28,7 +28,7 @@ public class ListCommand implements CommandExecutor {
 
             Player p = (Player) cs;
             if (args.length == 0) {
-                new PluginChannel(plugin, p, new Object[]{"ListWarps", plugin.checkPermissions(p), p.getName()}).send();
+                new BukkitPluginChannel(plugin, p, new Object[]{"ListWarps", plugin.checkPermissions(p), p.getName()}).send();
 
             }
             plugin.in_command.remove(cs);

@@ -1,8 +1,8 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -37,7 +37,7 @@ public class DeleteCommand implements CommandExecutor {
 
             Player p = (Player) cs;
             if (args.length == 1) {
-                new PluginChannel(plugin, p, new Object[]{"DelWarp", p.getName(), args[0]}).send();
+                new BukkitPluginChannel(plugin, p, new Object[]{"DelWarp", p.getName(), args[0]}).send();
             } else {
                 formator.sendMessage(cs, config.load("warps", "messages.yml").getString("warp.delete"));
             }
