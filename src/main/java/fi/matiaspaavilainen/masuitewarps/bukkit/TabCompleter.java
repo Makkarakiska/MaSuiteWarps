@@ -19,7 +19,7 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
         if(cmd.getName().equalsIgnoreCase("warp") || cmd.getName().equalsIgnoreCase("delwarp")){
             if (args.length == 1) {
                 List<String> warps = new ArrayList<>();
-                MaSuiteWarps.warps.forEach(warp -> {
+                MaSuiteWarps.warps.values().forEach(warp -> {
                     String type = "global";
                     if(!warp.isGlobal()){
                         type = "server";
