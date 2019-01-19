@@ -1,8 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -65,7 +64,7 @@ public class Sign implements Listener {
                 if (p.hasPermission("masuitewarps.warp.sign.hidden")) {
                     types.add("HIDDEN");
                 }
-                new PluginChannel(plugin, p, new Object[]{"WarpSign", types.toString(), p.getName(), ChatColor.stripColor(sign.getLine(getWarpLine()))}).send();
+                new BukkitPluginChannel(plugin, p, new Object[]{"WarpSign", types.toString(), p.getName(), ChatColor.stripColor(sign.getLine(getWarpLine()))}).send();
             }
 
         }
