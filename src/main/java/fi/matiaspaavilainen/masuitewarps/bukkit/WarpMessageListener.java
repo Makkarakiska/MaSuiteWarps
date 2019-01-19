@@ -40,14 +40,10 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                         Float.parseFloat(loc[4]),
                         Float.parseFloat(loc[5])));
             }
-            if (subchannel.equals("ListWarpsForPlayers")) {
+            if (subchannel.equals("CreateWarp")) {
                 String w = in.readUTF().toLowerCase();
-                String[] warps = w.split("::");
-                for (String warp : warps) {
-                    String[] info = warp.split(":");
-                    MaSuiteWarps.warps.add(new Warp(info[0], Boolean.valueOf(info[1]), Boolean.valueOf(info[2])));
-                    MaSuiteWarps.warpNames.add(info[0].toLowerCase());
-                }
+                String[] warp = w.split(":");
+                MaSuiteWarps.warps.put(warp[0].toLowerCase(), new Warp(warp[0], Boolean.valueOf(warp[1]), Boolean.valueOf(warp[2])));
             }
             if (subchannel.equals("WarpCooldown")) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
@@ -57,18 +53,8 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                 MaSuiteWarps.cooldowns.put(p.getUniqueId(), in.readLong());
             }
             if (subchannel.equals("DelWarp")) {
-                String w = in.readUTF();
-                MaSuiteWarps.warpNames.remove(w);
-                Warp foundWarp = null;
-                for (Warp warp : MaSuiteWarps.warps) {
-                    if (warp.getName().equalsIgnoreCase(w)) {
-                        foundWarp = warp;
-                        break;
-                    }
-                }
-                if (foundWarp != null) {
-                    MaSuiteWarps.warps.remove(foundWarp);
-                }
+                MaSuiteWarps.warps.remove(in.readUTF());
+
             }
         } catch (IOException e) {
             e.printStackTrace();
