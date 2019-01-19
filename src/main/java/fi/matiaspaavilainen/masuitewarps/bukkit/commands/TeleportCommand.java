@@ -1,8 +1,8 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.Countdown;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
@@ -65,10 +65,8 @@ public class TeleportCommand implements CommandExecutor {
             } else if (args.length == 2) {
                 if (cs.hasPermission("masuitewarps.warp.others")) {
                     if (checkWarp(cs, args[0])) {
-                        Player p = Bukkit.getPlayer(args[1]);
-                        if (p != null) {
-                            sendLastLoc(p);
-                            new PluginChannel(plugin, p, new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
+                        if (plugin.getServer().getOnlinePlayers().stream().findFirst().isPresent()) {
+                            new BukkitPluginChannel(plugin, plugin.getServer().getOnlinePlayers().stream().findFirst().get(), new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
                         }
                     }
                 } else {
@@ -96,11 +94,11 @@ public class TeleportCommand implements CommandExecutor {
         } else {
             hidden = "-------";
         }
-        new PluginChannel(plugin, p, new Object[]{"WarpCommand", hidden, p.getName(), args[0]}).send();
+        new BukkitPluginChannel(plugin, p, new Object[]{"WarpCommand", hidden, p.getName(), args[0]}).send();
     }
 
     private Boolean checkWarp(CommandSender cs, String name) {
-        if (MaSuiteWarps.warpNames.contains(name.toLowerCase())) {
+        if (MaSuiteWarps.warps.containsKey(name.toLowerCase())) {
             return true;
         } else {
             formator.sendMessage(cs, config.load("warps", "messages.yml").getString("warp-not-found"));
@@ -127,6 +125,6 @@ public class TeleportCommand implements CommandExecutor {
 
     private void sendLastLoc(Player p) {
         Location loc = p.getLocation();
-        new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "GetLocation", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+        new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "GetLocation", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
     }
 }
