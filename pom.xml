@@ -6,7 +6,7 @@
 
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteWarps</artifactId>
-    <version>1.4.7.2</version>
+    <version>1.4.7.3</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>fi.matiaspaavilainen</groupId>
             <artifactId>MaSuiteCore</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>1.5.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
