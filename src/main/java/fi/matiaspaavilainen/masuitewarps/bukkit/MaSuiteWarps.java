@@ -1,8 +1,8 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.DeleteCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.ListCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.SetCommand;
@@ -23,8 +23,7 @@ import java.util.*;
 public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public static HashSet<UUID> warmups = new HashSet<>();
-    public static HashSet<Warp> warps = new HashSet<>();
-    public static HashSet<String> warpNames = new HashSet<>();
+    public static HashMap<String, Warp> warps = new HashMap<>();
     public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public final List<CommandSender> in_command = new ArrayList<>();
 
@@ -77,7 +76,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         if (warps.isEmpty()) {
-            getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new PluginChannel(this, e.getPlayer(), new Object[]{"RequestWarps"}).send(), 100);
+            getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"RequestWarps"}).send(), 100);
         }
     }
 
