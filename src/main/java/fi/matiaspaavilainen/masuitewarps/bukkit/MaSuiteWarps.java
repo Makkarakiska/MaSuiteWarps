@@ -1,6 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.DeleteCommand;
@@ -47,6 +48,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Sign(this), this);
 
+        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60454"}).checkUpdates();
 
         registerCommands();
         requestWarps();
