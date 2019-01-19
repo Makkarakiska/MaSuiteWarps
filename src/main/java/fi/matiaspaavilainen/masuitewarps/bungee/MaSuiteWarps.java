@@ -1,6 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps.bungee;
 
 import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
@@ -99,7 +100,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             String name = in.readUTF();
             String[] location = in.readUTF().split(":");
-            Set set = new Set();
+            Set set = new Set(this);
             if (i == 3) {
                 set.setWarp(p, name, new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF());
                 updateWarps();
@@ -114,7 +115,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (p == null) {
                 return;
             }
-            Delete delete = new Delete();
+            Delete delete = new Delete(this);
             delete.deleteWarp(p, in.readUTF());
             updateWarps();
         }
@@ -125,23 +126,20 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
     private void updateWarps() {
         Warp w = new Warp();
-        StringBuilder warps = new StringBuilder();
-        w.all().forEach(warp -> warps.append(warp.getName()).append(":").append(warp.isGlobal().toString()).append(":").append(warp.isHidden().toString()).append("::"));
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("ListWarpsForPlayers");
-            out.writeUTF(warps.toString());
-            for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
-                ServerInfo serverInfo = entry.getValue();
-                serverInfo.ping((result, error) -> {
-                    if (error == null) {
-                        serverInfo.sendData("BungeeCord", b.toByteArray());
+        w.all().forEach(warp -> {
+                    StringBuilder warpInfo = new StringBuilder();
+                    warpInfo.append(warp.getName()).append(":").append(warp.isGlobal().toString()).append(":").append(warp.isHidden().toString());
+                    for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
+                        ServerInfo serverInfo = entry.getValue();
+                        serverInfo.ping((result, error) -> {
+                            if (error == null) {
+                                new BungeePluginChannel(this, serverInfo, new Object[]{"CreateWarp", warpInfo.toString()}).send();
+                            }
+                        });
                     }
-                });
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+                }
+        );
     }
 
     private void sendCooldown(ProxiedPlayer p) {
@@ -150,7 +148,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             out.writeUTF("WarpCooldown");
             out.writeUTF(p.getUniqueId().toString());
             out.writeLong(System.currentTimeMillis());
-            ProxyServer.getInstance().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+            getProxy().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
         } catch (IOException e) {
             e.printStackTrace();
         }
