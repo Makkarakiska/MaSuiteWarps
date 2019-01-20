@@ -94,7 +94,11 @@ public class TeleportCommand implements CommandExecutor {
         } else {
             hidden = "-------";
         }
-        new BukkitPluginChannel(plugin, p, new Object[]{"WarpCommand", hidden, p.getName(), args[0]}).send();
+        boolean hasPerm = false;
+        if(p.hasPermission("masuitewarps.warp.to." + args[0]) || p.hasPermission("masuitewarps.warp.to.*")){
+            hasPerm = true;
+        }
+        new BukkitPluginChannel(plugin, p, new Object[]{"WarpCommand", hidden, p.getName(), args[0], hasPerm}).send();
     }
 
     private Boolean checkWarp(CommandSender cs, String name) {

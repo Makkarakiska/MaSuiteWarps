@@ -68,7 +68,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
-            teleport.warp(p, warp, "sign", permissions);
+            teleport.warp(p, warp, "sign", permissions, in.readBoolean());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
@@ -81,7 +81,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Warp warp = new Warp();
             warp = warp.find(in.readUTF());
             Teleport teleport = new Teleport(this);
-            teleport.warp(p, warp, "command", permissions);
+            teleport.warp(p, warp, "command", permissions, in.readBoolean());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpPlayerCommand")) {

@@ -2,15 +2,13 @@ package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.bungee.Warp;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class Teleport {
@@ -23,8 +21,8 @@ public class Teleport {
         plugin = p;
     }
 
-    public void warp(ProxiedPlayer p, Warp warp, String type, String permissions) {
-        if (check(p, warp, p)) return;
+    public void warp(ProxiedPlayer p, Warp warp, String type, String permissions, boolean perm) {
+        if (check(p, warp, perm)) return;
         if (warp.isHidden() && !permissions.contains("HIDDEN")) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
             return;
@@ -49,7 +47,7 @@ public class Teleport {
                 return;
             }
             if (utils.isOnline(p, sender)) {
-                if (check(p, warp, sender)) return;
+                if (check(p, warp, true)) return;
             }
         }
         if (utils.isOnline(p)) {
@@ -57,13 +55,13 @@ public class Teleport {
         }
     }
 
-    private boolean check(ProxiedPlayer p, Warp warp, ProxiedPlayer sender) {
+    private boolean check(ProxiedPlayer p, Warp warp, boolean perm) {
         if (warp.getServer() == null) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
             return true;
         }
         if (config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission")) {
-            if (!sender.hasPermission("masuitewarps.warp.to." + warp.getName().toLowerCase()) && !sender.hasPermission("masuitewarps.warp.to.*")) {
+            if (!perm) {
                 formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
                 return true;
             }
@@ -78,25 +76,17 @@ public class Teleport {
     }
 
     private void warpPlayer(ProxiedPlayer p, Warp warp) {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("WarpPlayer");
-            out.writeUTF(p.getUniqueId().toString());
-            out.writeUTF(warp.getLocation().getWorld()
-                    + ":" + warp.getLocation().getX()
-                    + ":" + warp.getLocation().getY()
-                    + ":" + warp.getLocation().getZ()
-                    + ":" + warp.getLocation().getYaw()
-                    + ":" + warp.getLocation().getPitch());
-            if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
-                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
-            } else {
-                p.getServer().sendData("BungeeCord", b.toByteArray());
-            }
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
-        } catch (IOException e) {
-            e.getStackTrace();
+        BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getServer()), new Object[]{
+                "WarpPlayer",
+                p.getUniqueId().toString(),
+                warp.getLocation().getWorld() + ":" + warp.getLocation().getX() + ":" + warp.getLocation().getY() + ":" + warp.getLocation().getZ() + ":" + warp.getLocation().getYaw() + ":" + warp.getLocation().getPitch()
+        });
+        if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
+            p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
+            ProxyServer.getInstance().getScheduler().schedule(plugin, bsc::send, 500, TimeUnit.MILLISECONDS);
+        } else {
+            bsc.send();
         }
+        formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
     }
 }
