@@ -39,7 +39,7 @@ public class DeleteCommand implements CommandExecutor {
             if (args.length == 1) {
                 new BukkitPluginChannel(plugin, p, new Object[]{"DelWarp", p.getName(), args[0]}).send();
             } else {
-                formator.sendMessage(cs, config.load("warps", "messages.yml").getString("warp.delete"));
+                formator.sendMessage(cs, config.load("warps", "syntax.yml").getString("warp.delete"));
             }
             plugin.in_command.remove(cs);
 
