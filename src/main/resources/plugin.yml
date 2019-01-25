@@ -7,7 +7,7 @@ api-version: 1.13
 commands:
   warp:
     description: Warps player to specified location
-    aliases: [warpto]
+    aliases: [warpto, tt]
     permission: masuitewarps.warp
   setwarp:
     description: Creates warp point
@@ -19,4 +19,4 @@ commands:
     permission: masuitewarps.delwarp
   warps:
     description: Lists all available warps
-    aliases: [listwarps, warplist]
+    aliases: [listwarps, warplist, tts]
