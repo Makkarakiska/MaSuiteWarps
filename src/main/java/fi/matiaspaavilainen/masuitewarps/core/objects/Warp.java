@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuitewarps.bungee;
+package fi.matiaspaavilainen.masuitewarps.core.objects;
 
 import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
 import fi.matiaspaavilainen.masuitecore.core.database.Database;
@@ -16,7 +16,7 @@ public class Warp {
     private Database db = ConnectionManager.db;
     private Connection connection = null;
     private PreparedStatement statement = null;
-    private String tablePrefix = db.getTablePrefix();
+    private String tablePrefix;
     // Info
     private int id;
     private String name;
@@ -31,6 +31,7 @@ public class Warp {
      * An empty constructor for Warp
      */
     public Warp() {
+        this.tablePrefix = db.getTablePrefix();
     }
 
     /**
@@ -42,13 +43,25 @@ public class Warp {
      * @param hidden is warp hidden or not
      * @param global is warp global or not
      */
-    public Warp(String name, String server, Location loc, Boolean hidden, Boolean global) {
+    public Warp(String name, String server, Location loc, boolean hidden, boolean global) {
         this.name = name;
         this.server = server;
         this.hidden = hidden;
         this.global = global;
-
         this.location = loc;
+        this.tablePrefix = db.getTablePrefix();
+    }
+
+    /**
+     * A constructor for Bukkit side Warp
+     * <p>
+     * Note: Use only when bridge mode is enabled!
+     * </p>
+     */
+    public Warp(String name, boolean hidden, boolean global) {
+        this.name = name;
+        this.hidden = hidden;
+        this.global = global;
     }
 
     /**
