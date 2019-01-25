@@ -1,7 +1,5 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
-import com.sun.deploy.util.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
