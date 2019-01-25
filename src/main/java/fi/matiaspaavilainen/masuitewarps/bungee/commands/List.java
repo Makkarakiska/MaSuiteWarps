@@ -43,7 +43,7 @@ public class List {
                 if (i++ == warps.size() - 1) {
                     TextComponent hc = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.name").replace("%warp%", warp.getName())));
                     hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(formator.colorize(config.load("warps", "bungee/messages.yml").getString("warp-hover-text").replace("%warp%", warp.getName()))).create()));
+                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(formator.colorize(config.load("warps", "messages.yml").getString("warp-hover-text").replace("%warp%", warp.getName()))).create()));
                     server.addExtra(hc);
                 } else {
                     TextComponent hc = new TextComponent(formator.colorize(config.load("warps", "messages.yml").getString("warp.name").replace("%warp%", warp.getName())));
