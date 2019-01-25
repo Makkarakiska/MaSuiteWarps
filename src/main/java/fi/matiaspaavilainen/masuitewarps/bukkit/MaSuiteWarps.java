@@ -8,6 +8,7 @@ import fi.matiaspaavilainen.masuitewarps.bukkit.commands.DeleteCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.ListCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.SetCommand;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.TeleportCommand;
+import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

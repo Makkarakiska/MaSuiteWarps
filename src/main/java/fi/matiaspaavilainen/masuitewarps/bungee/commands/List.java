@@ -2,7 +2,7 @@ package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
-import fi.matiaspaavilainen.masuitewarps.bungee.Warp;
+import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;

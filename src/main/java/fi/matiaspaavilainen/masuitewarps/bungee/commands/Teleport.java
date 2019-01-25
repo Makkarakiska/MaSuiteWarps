@@ -5,7 +5,7 @@ import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
-import fi.matiaspaavilainen.masuitewarps.bungee.Warp;
+import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -49,6 +49,9 @@ public class Teleport {
             if (utils.isOnline(p, sender)) {
                 if (check(p, warp, true)) return;
             }
+        }
+        if(warp.getServer() == null){
+            return;
         }
         if (utils.isOnline(p)) {
             warpPlayer(p, warp);

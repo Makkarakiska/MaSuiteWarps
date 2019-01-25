@@ -9,6 +9,7 @@ import fi.matiaspaavilainen.masuitewarps.bungee.commands.Delete;
 import fi.matiaspaavilainen.masuitewarps.bungee.commands.List;
 import fi.matiaspaavilainen.masuitewarps.bungee.commands.Set;
 import fi.matiaspaavilainen.masuitewarps.bungee.commands.Teleport;
+import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
