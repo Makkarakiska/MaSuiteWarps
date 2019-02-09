@@ -20,6 +20,7 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
@@ -128,13 +129,21 @@ public class MaSuiteWarps extends Plugin implements Listener {
     private void updateWarps() {
         Warp w = new Warp();
         w.all().forEach(warp -> {
-                    StringBuilder warpInfo = new StringBuilder();
-                    warpInfo.append(warp.getName()).append(":").append(warp.isGlobal().toString()).append(":").append(warp.isHidden().toString());
+            StringJoiner info = new StringJoiner(":");
+            Location loc = warp.getLocation();
+            info.add(warp.getName())
+                    .add(warp.getServer())
+                    .add(loc.getWorld())
+                    .add(loc.getX().toString())
+                    .add(loc.getY().toString())
+                    .add(loc.getZ().toString())
+                    .add(warp.isGlobal().toString())
+                    .add(warp.isHidden().toString());
                     for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
                         ServerInfo serverInfo = entry.getValue();
                         serverInfo.ping((result, error) -> {
                             if (error == null) {
-                                new BungeePluginChannel(this, serverInfo, new Object[]{"CreateWarp", warpInfo.toString()}).send();
+                                new BungeePluginChannel(this, serverInfo, new Object[]{"CreateWarp", info.toString()}).send();
                             }
                         });
                     }

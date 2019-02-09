@@ -1,8 +1,8 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +34,7 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                     System.out.println("[MaSuite] [Warps] [World=" + loc[0] + "] World  could not be found!");
                     return;
                 }
-                p.teleport(new Location(Bukkit.getWorld(loc[0]),
+                p.teleport(new org.bukkit.Location(Bukkit.getWorld(loc[0]),
                         Double.parseDouble(loc[1]),
                         Double.parseDouble(loc[2]),
                         Double.parseDouble(loc[3]),
@@ -44,7 +44,7 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
             if (subchannel.equals("CreateWarp")) {
                 String w = in.readUTF().toLowerCase();
                 String[] warp = w.split(":");
-                MaSuiteWarps.warps.put(warp[0].toLowerCase(), new Warp(warp[0], Boolean.valueOf(warp[1]), Boolean.valueOf(warp[2])));
+                MaSuiteWarps.warps.put(warp[0].toLowerCase(), new Warp(warp[0], warp[1], new Location(warp[2], Double.parseDouble(warp[3]), Double.parseDouble(warp[4]), Double.parseDouble(warp[5])), Boolean.valueOf(warp[6]), Boolean.valueOf(warp[7])));
             }
             if (subchannel.equals("WarpCooldown")) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));

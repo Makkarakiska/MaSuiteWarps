@@ -16,7 +16,7 @@ public class Warp {
     private Database db = ConnectionManager.db;
     private Connection connection = null;
     private PreparedStatement statement = null;
-    private String tablePrefix;
+    private String tablePrefix = db == null ? "" : db.getTablePrefix();
     // Info
     private int id;
     private String name;
@@ -31,7 +31,6 @@ public class Warp {
      * An empty constructor for Warp
      */
     public Warp() {
-        this.tablePrefix = db.getTablePrefix();
     }
 
     /**
@@ -49,19 +48,6 @@ public class Warp {
         this.hidden = hidden;
         this.global = global;
         this.location = loc;
-        this.tablePrefix = db.getTablePrefix();
-    }
-
-    /**
-     * A constructor for Bukkit side Warp
-     * <p>
-     * Note: Use only when bridge mode is enabled!
-     * </p>
-     */
-    public Warp(String name, boolean hidden, boolean global) {
-        this.name = name;
-        this.hidden = hidden;
-        this.global = global;
     }
 
     /**
