@@ -28,7 +28,7 @@ public class Delete {
             return;
         }
         if (warp.delete(name)) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-deleted"));
+            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-deleted").replace("%warp%", warp.getName()));
             for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
                 ServerInfo serverInfo = entry.getValue();
                 serverInfo.ping((result, error) -> {
