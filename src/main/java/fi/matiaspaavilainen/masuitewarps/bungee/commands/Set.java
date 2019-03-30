@@ -22,10 +22,11 @@ public class Set {
         this.plugin = plugin;
     }
 
-    public void setWarp(ProxiedPlayer p, String name, Location loc) {
+    public Warp setWarp(ProxiedPlayer p, String name, Location loc) {
         Warp wp = new Warp().find(name);
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc, false, true);
         create(p, wp, warp);
+        return warp;
     }
 
     public void setWarp(ProxiedPlayer p, String name, Location loc, String type) {
