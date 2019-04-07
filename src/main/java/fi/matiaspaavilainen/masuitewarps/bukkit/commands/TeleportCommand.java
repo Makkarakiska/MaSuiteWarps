@@ -3,7 +3,7 @@ package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitewarps.bukkit.Countdown;
+import fi.matiaspaavilainen.masuitecore.core.utils.BukkitWarmup;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,7 +41,7 @@ public class TeleportCommand implements CommandExecutor {
                         if (plugin.getConfig().getInt("warmup") > 0) {
                             MaSuiteWarps.warmups.add(p.getUniqueId());
                             formator.sendMessage(cs, config.load("warps", "messages.yml").getString("teleportation-started").replace("%time%", String.valueOf(config.load("warps", "config.yml").getInt("warmup"))));
-                            new Countdown(config.load("warps", "config.yml").getInt("warmup"), plugin) {
+                            new BukkitWarmup(config.load("warps", "config.yml").getInt("warmup"), plugin) {
                                 @Override
                                 public void count(int current) {
                                     if (current == 0) {
@@ -95,7 +95,7 @@ public class TeleportCommand implements CommandExecutor {
             hidden = "-------";
         }
         boolean hasPerm = false;
-        if(p.hasPermission("masuitewarps.warp.to." + args[0]) || p.hasPermission("masuitewarps.warp.to.*")){
+        if (p.hasPermission("masuitewarps.warp.to." + args[0]) || p.hasPermission("masuitewarps.warp.to.*")) {
             hasPerm = true;
         }
         new BukkitPluginChannel(plugin, p, new Object[]{"WarpCommand", hidden, p.getName(), args[0], hasPerm}).send();
@@ -117,7 +117,7 @@ public class TeleportCommand implements CommandExecutor {
                     MaSuiteWarps.cooldowns.remove(p.getUniqueId());
                     return true;
                 } else {
-                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("in-cooldown").replace("%time%", plugin.getConfig().getString("cooldown")));
+                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("in-cooldown").replace("%time%", plugin.config.load("warps", "config.yml").getString("cooldown")));
                     return false;
                 }
             } else {
