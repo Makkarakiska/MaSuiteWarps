@@ -66,7 +66,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (getConfig().getInt("warmup") > 0) {
+        if (config.load("warps", "config.yml").getInt("warmup") > 0) {
             if (warmups.contains(e.getPlayer().getUniqueId())) {
                 if (e.getFrom() != e.getTo()) {
                     formator.sendMessage(e.getPlayer(), config.load("warps", "messages.yml").getString("teleportation-cancelled"));
