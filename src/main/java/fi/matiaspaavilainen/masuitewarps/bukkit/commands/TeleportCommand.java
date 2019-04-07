@@ -38,7 +38,7 @@ public class TeleportCommand implements CommandExecutor {
 
                 if (checkWarp(cs, args[0])) {
                     if (checkCooldown(p)) {
-                        if (plugin.getConfig().getInt("warmup") > 0) {
+                        if (plugin.config.load("warps", "config.yml").getInt("warmup") > 0) {
                             MaSuiteWarps.warmups.add(p.getUniqueId());
                             formator.sendMessage(cs, config.load("warps", "messages.yml").getString("teleportation-started").replace("%time%", String.valueOf(config.load("warps", "config.yml").getInt("warmup"))));
                             new BukkitWarmup(config.load("warps", "config.yml").getInt("warmup"), plugin) {
