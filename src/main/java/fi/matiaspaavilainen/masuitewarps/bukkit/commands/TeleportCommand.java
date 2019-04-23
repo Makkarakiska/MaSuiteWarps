@@ -26,7 +26,12 @@ public class TeleportCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
         if (!(cs instanceof Player)) {
-            return false;
+            if (checkWarp(cs, args[0])) {
+                  if (plugin.getServer().getOnlinePlayers().stream().findFirst().isPresent()) {
+                      new BukkitPluginChannel(plugin, plugin.getServer().getOnlinePlayers().stream().findFirst().get(), new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
+                  }
+            } 
+            return true;
         }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
