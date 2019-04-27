@@ -50,9 +50,6 @@ public class Teleport {
                 if (check(p, warp, true)) return;
             }
         }
-        if(warp.getServer() == null){
-            return;
-        }
         if (utils.isOnline(p)) {
             warpPlayer(p, warp);
         }

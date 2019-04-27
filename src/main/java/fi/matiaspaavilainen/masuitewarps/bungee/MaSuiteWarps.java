@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bungee;
 
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
@@ -27,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 public class MaSuiteWarps extends Plugin implements Listener {
 
     public HashMap<String, Warp> warps = new HashMap<>();
+    public BungeeConfiguration config = new BungeeConfiguration();
+    public Formator formator = new Formator();
 
     @Override
     public void onEnable() {
@@ -42,7 +45,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
 
-        new Warp().all().forEach(warp -> warps.put(warp.getName(), warp));
+        new Warp().all().forEach(warp -> warps.put(warp.getName().toLowerCase(), warp));
 
         // Send list of warp
         updateWarps();
@@ -62,7 +65,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
         Teleport teleport = new Teleport(this);
         if (subchannel.equals("ListWarps")) {
             String types = in.readUTF();
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
@@ -71,30 +74,45 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
         if (subchannel.equals("WarpSign")) {
             String permissions = in.readUTF();
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
-            teleport.warp(p, warps.get(in.readUTF()), "sign", permissions, in.readBoolean());
+            String warp = in.readUTF();
+            if (warps.get(warp.toLowerCase()) == null) {
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+                return;
+            }
+            teleport.warp(p, warps.get(warp), "sign", permissions, in.readBoolean());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
             String permissions = in.readUTF();
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
-            teleport.warp(p, warps.get(in.readUTF()), "command", permissions, in.readBoolean());
+            String warp = in.readUTF();
+            if (warps.get(warp.toLowerCase()) == null) {
+                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+                return;
+            }
+            teleport.warp(p, warps.get(warp), "command", permissions, in.readBoolean());
             sendCooldown(p);
         }
         if (subchannel.equals("WarpPlayerCommand")) {
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             String s = in.readUTF();
-            teleport.warp(p, s, warps.get(in.readUTF()), "command");
+            String warp = in.readUTF();
+            if (warps.get(warp.toLowerCase()) == null) {
+                formator.sendMessage(getProxy().getPlayer(s), config.load("warps", "messages.yml").getString("warp-not-found"));
+                return;
+            }
+            teleport.warp(p, s, warps.get(warp), "command");
         }
         if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
@@ -102,16 +120,18 @@ public class MaSuiteWarps extends Plugin implements Listener {
             String[] location = in.readUTF().split(":");
             Set set = new Set(this);
             if (i == 3) {
+                warps.put(name.toLowerCase(), set.setWarp(p, name,
+                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF()));
                 set.setWarp(p, name, new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF());
                 updateWarps();
             } else if (i == 2) {
-                warps.put(name, set.setWarp(p, name,
+                warps.put(name.toLowerCase(), set.setWarp(p, name,
                         new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5]))));
                 updateWarps();
             }
         }
         if (subchannel.equals("DelWarp")) {
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }

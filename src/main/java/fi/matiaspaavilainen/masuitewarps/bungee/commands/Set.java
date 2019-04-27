@@ -10,6 +10,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class Set {
 
@@ -25,11 +26,10 @@ public class Set {
     public Warp setWarp(ProxiedPlayer p, String name, Location loc) {
         Warp wp = new Warp().find(name);
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc, false, true);
-        create(p, wp, warp);
-        return warp;
+        return create(p, wp, warp);
     }
 
-    public void setWarp(ProxiedPlayer p, String name, Location loc, String type) {
+    public Warp setWarp(ProxiedPlayer p, String name, Location loc, String type) {
         Warp wp = new Warp().find(name);
         boolean hidden = false;
         boolean global = true;
@@ -43,13 +43,13 @@ public class Set {
         } else if (type.equalsIgnoreCase("global")) {
             global = !global;
         } else {
-            return;
+            return null;
         }
         Warp warp = new Warp(name, p.getServer().getInfo().getName(), loc, hidden, global);
-        create(p, wp, warp);
+        return create(p, wp, warp);
     }
 
-    private void create(ProxiedPlayer p, Warp wp, Warp warp) {
+    private Warp create(ProxiedPlayer p, Warp wp, Warp warp) {
         warp.create();
         if (wp.getServer() != null) {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
@@ -57,15 +57,24 @@ public class Set {
             formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
         }
 
-        StringBuilder warpInfo = new StringBuilder();
-        warpInfo.append(warp.getName()).append(":").append(warp.isGlobal().toString()).append(":").append(warp.isHidden().toString());
+        StringJoiner info = new StringJoiner(":");
+        Location loc = warp.getLocation();
+        info.add(warp.getName())
+                .add(warp.getServer())
+                .add(loc.getWorld())
+                .add(loc.getX().toString())
+                .add(loc.getY().toString())
+                .add(loc.getZ().toString())
+                .add(warp.isGlobal().toString())
+                .add(warp.isHidden().toString());
         for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
             ServerInfo serverInfo = entry.getValue();
             serverInfo.ping((result, error) -> {
                 if (error == null) {
-                    new BungeePluginChannel(plugin, serverInfo, new Object[]{"CreateWarp", warpInfo.toString()}).send();
+                    new BungeePluginChannel(plugin, serverInfo, new Object[]{"CreateWarp", info.toString()}).send();
                 }
             });
         }
+        return warp;
     }
 }
