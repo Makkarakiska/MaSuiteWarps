@@ -68,10 +68,13 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     public void onMove(PlayerMoveEvent e) {
         if (config.load("warps", "config.yml").getInt("warmup") > 0) {
             if (warmups.contains(e.getPlayer().getUniqueId())) {
-                if (e.getFrom() != e.getTo()) {
-                    formator.sendMessage(e.getPlayer(), config.load("warps", "messages.yml").getString("teleportation-cancelled"));
-                    warmups.remove(e.getPlayer().getUniqueId());
-                }
+            	
+            	// Not move
+            	if (e.getTo().getBlockX() == e.getFrom().getBlockX() && e.getTo().getBlockY() == e.getFrom().getBlockY() && e.getTo().getBlockZ() == e.getFrom().getBlockZ()) return;
+            	
+                formator.sendMessage(e.getPlayer(), config.load("warps", "messages.yml").getString("teleportation-cancelled"));
+                warmups.remove(e.getPlayer().getUniqueId());
+            
             }
         }
     }
