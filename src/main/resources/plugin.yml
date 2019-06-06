@@ -3,6 +3,7 @@ main: fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps
 version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
+softdepend: [Multiverse, Multiworld]
 api-version: 1.13
 commands:
   warp:
