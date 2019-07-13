@@ -124,6 +124,7 @@ public class TeleportCommand implements CommandExecutor {
 
     private Boolean checkCooldown(Player p) {
         if (plugin.getConfig().getInt("cooldown") > 0) {
+            if(p.hasPermission("masuitewarps.cooldown.override")) return true;
             if (MaSuiteWarps.cooldowns.containsKey(p.getUniqueId())) {
                 if (System.currentTimeMillis() - MaSuiteWarps.cooldowns.get(p.getUniqueId()) > plugin.getConfig().getInt("cooldown") * 1000) {
                     MaSuiteWarps.cooldowns.remove(p.getUniqueId());
