@@ -117,7 +117,7 @@ public class TeleportCommand implements CommandExecutor {
         if (MaSuiteWarps.warps.containsKey(name.toLowerCase())) {
             return true;
         } else {
-            formator.sendMessage(cs, config.load("warps", "messages.yml").getString("warp-not-found"));
+            formator.sendMessage(cs, plugin.warpNotFound);
             return false;
         }
     }

@@ -31,6 +31,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
 
+    public boolean perWarpPermission = false;
+
+    public String warpNotFound = "";
+    public String noPermission = "";
+    public String warpInOtherServer = "";
+    public String teleported = "";
+
     @Override
     public void onEnable() {
         // Configuration
@@ -53,6 +60,11 @@ public class MaSuiteWarps extends Plugin implements Listener {
         // Updator
         new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60454"}).checkUpdates();
 
+        perWarpPermission = config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission");
+        warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
+        noPermission = config.load("warps", "messages.yml").getString("no-permission");
+        warpInOtherServer = config.load("warps", "messages.yml").getString("warp-in-other-server");
+        teleported = config.load("warps", "messages.yml").getString("teleported");
     }
 
     @EventHandler

@@ -1,9 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
-import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
 import net.md_5.bungee.api.ProxyServer;
@@ -12,8 +10,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.concurrent.TimeUnit;
 
 public class Teleport {
-    private Formator formator = new Formator();
-    private BungeeConfiguration config = new BungeeConfiguration();
     private Utils utils = new Utils();
     private MaSuiteWarps plugin;
 
@@ -24,16 +20,16 @@ public class Teleport {
     public void warp(ProxiedPlayer p, Warp warp, String type, String permissions, boolean perm) {
         if (check(p, warp, perm)) return;
         if (warp.isHidden() && !permissions.contains("HIDDEN")) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+            plugin.formator.sendMessage(p, plugin.noPermission);
             return;
         }
         if (type.equals("sign")) {
             if (warp.isGlobal() && !permissions.contains("GLOBAL")) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+                plugin.formator.sendMessage(p, plugin.noPermission);
                 return;
             }
             if (!warp.isGlobal() && !permissions.contains("SERVER")) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+                plugin.formator.sendMessage(p, plugin.noPermission);
                 return;
             }
         }
@@ -57,18 +53,18 @@ public class Teleport {
 
     private boolean check(ProxiedPlayer p, Warp warp, boolean perm) {
         if (warp.getServer() == null) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+            plugin.formator.sendMessage(p, plugin.warpNotFound);
             return true;
         }
-        if (config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission")) {
+        if (plugin.perWarpPermission) {
             if (!perm) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("no-permission"));
+                plugin.formator.sendMessage(p, plugin.noPermission);
                 return true;
             }
         }
         if (!warp.isGlobal()) {
             if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-in-other-server"));
+                plugin.formator.sendMessage(p, plugin.warpInOtherServer);
                 return true;
             }
         }
@@ -87,6 +83,6 @@ public class Teleport {
         } else {
             bsc.send();
         }
-        formator.sendMessage(p, config.load("warps", "messages.yml").getString("teleported").replace("%warp%", warp.getName()));
+        plugin.formator.sendMessage(p, plugin.teleported.replace("%warp%", warp.getName()));
     }
 }

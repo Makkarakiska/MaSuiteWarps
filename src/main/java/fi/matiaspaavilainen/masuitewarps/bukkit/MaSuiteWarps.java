@@ -29,9 +29,10 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public final List<CommandSender> in_command = new ArrayList<>();
 
-
     public BukkitConfiguration config = new BukkitConfiguration();
     private Formator formator = new Formator();
+
+    public String warpNotFound = "";
 
     @Override
     public void onEnable() {
@@ -53,6 +54,8 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
         registerCommands();
         requestWarps();
+
+        warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
     }
 
     private void registerCommands() {
