@@ -11,7 +11,6 @@ import fi.matiaspaavilainen.masuitewarps.bungee.commands.List;
 import fi.matiaspaavilainen.masuitewarps.bungee.commands.Set;
 import fi.matiaspaavilainen.masuitewarps.bungee.commands.Teleport;
 import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -37,6 +36,18 @@ public class MaSuiteWarps extends Plugin implements Listener {
     public String noPermission = "";
     public String warpInOtherServer = "";
     public String teleported = "";
+
+    public String listHeaderGlobal = "";
+    public String listHeaderServer = "";
+    public String listHeaderHidden = "";
+
+    public String listWarpName = "";
+    public String listHoverText = "";
+    public String listWarpSplitter = "";
+
+    public String warpCreated = "";
+    public String warpUpdated = "";
+    public String warpDeleted = "";
 
     @Override
     public void onEnable() {
@@ -65,6 +76,18 @@ public class MaSuiteWarps extends Plugin implements Listener {
         noPermission = config.load("warps", "messages.yml").getString("no-permission");
         warpInOtherServer = config.load("warps", "messages.yml").getString("warp-in-other-server");
         teleported = config.load("warps", "messages.yml").getString("teleported");
+
+        listHeaderGlobal = config.load("warps", "messages.yml").getString("warp.global");
+        listHeaderServer = config.load("warps", "messages.yml").getString("warp.server");
+        listHeaderHidden = config.load("warps", "messages.yml").getString("warp.hidden");
+
+        listWarpName = config.load("warps", "messages.yml").getString("warp.name");
+        listHoverText = config.load("warps", "messages.yml").getString("warp-hover-text");
+        listWarpSplitter = config.load("warps", "messages.yml").getString("warp.split");
+
+        warpCreated = config.load("warps", "messages.yml").getString("warp-created");
+        warpUpdated = config.load("warps", "messages.yml").getString("warp-updated");
+        warpDeleted = config.load("warps", "messages.yml").getString("warp-deleted");
     }
 
     @EventHandler
@@ -81,7 +104,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (p == null) {
                 return;
             }
-            List list = new List();
+            List list = new List(this);
             list.listWarp(p, types);
         }
         if (subchannel.equals("WarpSign")) {
@@ -92,7 +115,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             String warp = in.readUTF();
             if (warps.get(warp.toLowerCase()) == null) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+                formator.sendMessage(p, warpNotFound);
                 return;
             }
             teleport.warp(p, warps.get(warp), "sign", permissions, in.readBoolean());
@@ -106,7 +129,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             String warp = in.readUTF();
             if (warps.get(warp.toLowerCase()) == null) {
-                formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-not-found"));
+                formator.sendMessage(p, warpNotFound);
                 return;
             }
             teleport.warp(p, warps.get(warp), "command", permissions, in.readBoolean());
@@ -117,7 +140,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             String s = in.readUTF();
             String warp = in.readUTF();
             if (warps.get(warp.toLowerCase()) == null) {
-                formator.sendMessage(getProxy().getPlayer(s), config.load("warps", "messages.yml").getString("warp-not-found"));
+                formator.sendMessage(getProxy().getPlayer(s), warpNotFound);
                 return;
             }
             teleport.warp(p, s, warps.get(warp), "command");

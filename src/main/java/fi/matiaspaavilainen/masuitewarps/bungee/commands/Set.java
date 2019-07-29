@@ -2,7 +2,6 @@ package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
@@ -14,7 +13,6 @@ import java.util.StringJoiner;
 
 public class Set {
 
-    private BungeeConfiguration config = new BungeeConfiguration();
     private Formator formator = new Formator();
 
     private MaSuiteWarps plugin;
@@ -52,9 +50,9 @@ public class Set {
     private Warp create(ProxiedPlayer p, Warp wp, Warp warp) {
         warp.create();
         if (wp.getServer() != null) {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-updated").replace("%warp%", warp.getName()));
+            formator.sendMessage(p, plugin.warpUpdated.replace("%warp%", warp.getName()));
         } else {
-            formator.sendMessage(p, config.load("warps", "messages.yml").getString("warp-created").replace("%warp%", warp.getName()));
+            formator.sendMessage(p, plugin.warpCreated.replace("%warp%", warp.getName()));
         }
 
         StringJoiner info = new StringJoiner(":");
