@@ -79,7 +79,7 @@ public class Teleport {
         });
         if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
             p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
-            ProxyServer.getInstance().getScheduler().schedule(plugin, bsc::send, 500, TimeUnit.MILLISECONDS);
+            ProxyServer.getInstance().getScheduler().schedule(plugin, bsc::send, plugin.warpDelay, TimeUnit.MILLISECONDS);
         } else {
             bsc.send();
         }
