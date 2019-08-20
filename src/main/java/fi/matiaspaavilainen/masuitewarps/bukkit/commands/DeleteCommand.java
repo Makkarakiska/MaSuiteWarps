@@ -1,8 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
-import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -24,12 +22,10 @@ public class DeleteCommand implements CommandExecutor {
             return false;
         }
 
-        BukkitConfiguration config = new BukkitConfiguration();
-        Formator formator = new Formator();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
             if (plugin.in_command.contains(cs)) {
-                formator.sendMessage(cs, config.load(null, "messages.yml").getString("on-active-command"));
+                plugin.formator.sendMessage(cs, plugin.onActiveCommand);
                 return;
             }
 
@@ -39,7 +35,7 @@ public class DeleteCommand implements CommandExecutor {
             if (args.length == 1) {
                 new BukkitPluginChannel(plugin, p, new Object[]{"DelWarp", p.getName(), args[0]}).send();
             } else {
-                formator.sendMessage(cs, config.load("warps", "syntax.yml").getString("warp.delete"));
+                plugin.formator.sendMessage(cs, plugin.deleteSyntax);
             }
             plugin.in_command.remove(cs);
 

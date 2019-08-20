@@ -30,9 +30,22 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     public final List<CommandSender> in_command = new ArrayList<>();
 
     public BukkitConfiguration config = new BukkitConfiguration();
-    private Formator formator = new Formator();
+    public Formator formator = new Formator();
 
     public String warpNotFound = "";
+    public String noPermission = "";
+    public String teleportationStarted = "";
+    public String teleportationCancelled = "";
+
+    public String inCooldown = "";
+    public int cooldownTime = 0;
+    public int warmupTime = 0;
+
+    public String teleportSyntax = "";
+    public String setSyntax = "";
+    public String deleteSyntax = "";
+
+    public String onActiveCommand = "";
 
     @Override
     public void onEnable() {
@@ -56,6 +69,19 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         requestWarps();
 
         warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
+        noPermission = config.load(null, "messages.yml").getString("no-permission");
+        teleportationStarted = config.load("warps", "messages.yml").getString("teleportation-started");
+        teleportationCancelled = config.load("warps", "messages.yml").getString("teleportation-cancelled");
+
+        cooldownTime = getConfig().getInt("cooldown");
+        inCooldown = config.load("warps", "config.yml").getString("cooldown");
+        warmupTime = config.load("warps", "config.yml").getInt("warmup");
+
+        teleportSyntax = config.load("warps", "syntax.yml").getString("warp.teleport");
+        setSyntax = config.load("warps", "syntax.yml").getString("warp.set");
+        deleteSyntax = config.load("warps", "syntax.yml").getString("warp.delete");
+
+        onActiveCommand = config.load(null, "messages.yml").getString("on-active-command");
     }
 
     private void registerCommands() {
@@ -69,15 +95,16 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (config.load("warps", "config.yml").getInt("warmup") > 0) {
+        if (warmupTime > 0) {
             if (warmups.contains(e.getPlayer().getUniqueId())) {
-            	
-            	// Not move
-            	if (e.getTo().getBlockX() == e.getFrom().getBlockX() && e.getTo().getBlockY() == e.getFrom().getBlockY() && e.getTo().getBlockZ() == e.getFrom().getBlockZ()) return;
-            	
-                formator.sendMessage(e.getPlayer(), config.load("warps", "messages.yml").getString("teleportation-cancelled"));
+
+                // Not move
+                if (e.getTo().getBlockX() == e.getFrom().getBlockX() && e.getTo().getBlockY() == e.getFrom().getBlockY() && e.getTo().getBlockZ() == e.getFrom().getBlockZ())
+                    return;
+
+                formator.sendMessage(e.getPlayer(), teleportationCancelled);
                 warmups.remove(e.getPlayer().getUniqueId());
-            
+
             }
         }
     }
@@ -116,7 +143,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public boolean checkCooldown(CommandSender cs, MaSuiteWarps plugin) {
         if (plugin.in_command.contains(cs)) {
-            formator.sendMessage(cs, config.load(null, "messages.yml").getString("on-active-command"));
+            formator.sendMessage(cs, onActiveCommand);
             return true;
         }
 

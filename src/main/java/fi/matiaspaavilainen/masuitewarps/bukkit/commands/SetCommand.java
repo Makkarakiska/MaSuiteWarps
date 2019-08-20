@@ -1,8 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
-import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,8 +22,6 @@ public class SetCommand implements CommandExecutor {
         if (!(cs instanceof Player)) {
             return false;
         }
-        Formator formator = new Formator();
-        BukkitConfiguration config = new BukkitConfiguration();
         if (plugin.checkCooldown(cs, plugin)) return false;
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
@@ -37,21 +33,21 @@ public class SetCommand implements CommandExecutor {
             } else if (args.length == 2) {
                 if (args[1].equalsIgnoreCase("hidden") || args[1].equalsIgnoreCase("global")) {
                     if (args[1].equalsIgnoreCase("hidden") && !p.hasPermission("masuitewarp.setwarp.hidden")) {
-                        formator.sendMessage(cs, config.load(null, "messages.yml").getString("no-permission"));
+                        plugin.formator.sendMessage(cs, plugin.noPermission);
                         return;
                     }
                     if (args[1].equalsIgnoreCase("global") && !p.hasPermission("masuitewarp.setwarp.global")) {
-                        formator.sendMessage(cs, config.load(null, "messages.yml").getString("no-permission"));
+                        plugin.formator.sendMessage(cs, plugin.noPermission);
                         return;
                     }
                     if (!args[1].equalsIgnoreCase("global") && !args[1].equalsIgnoreCase("hidden") && !p.hasPermission("masuitewarp.setwarp.server")) {
-                        formator.sendMessage(cs, config.load(null, "messages.yml").getString("no-permission"));
+                        plugin.formator.sendMessage(cs, plugin.noPermission);
                         return;
                     }
                     new BukkitPluginChannel(plugin, p, new Object[]{"SetWarp", 3, p.getName(), args[0], l, args[1]}).send();
                 }
             } else {
-                formator.sendMessage(cs, config.load("warps", "syntax.yml").getString("warp.set"));
+                plugin.formator.sendMessage(cs, plugin.setSyntax);
             }
             plugin.in_command.remove(cs);
         });

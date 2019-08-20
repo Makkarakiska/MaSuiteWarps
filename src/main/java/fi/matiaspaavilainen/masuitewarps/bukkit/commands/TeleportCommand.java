@@ -1,8 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 
-import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.utils.BukkitWarmup;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Bukkit;
@@ -16,9 +14,6 @@ public class TeleportCommand implements CommandExecutor {
 
     private MaSuiteWarps plugin;
 
-    private BukkitConfiguration config = new BukkitConfiguration();
-    private Formator formator = new Formator();
-
     public TeleportCommand(MaSuiteWarps p) {
         plugin = p;
     }
@@ -27,10 +22,10 @@ public class TeleportCommand implements CommandExecutor {
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
         if (!(cs instanceof Player)) {
             if (checkWarp(cs, args[0])) {
-                  if (plugin.getServer().getOnlinePlayers().stream().findFirst().isPresent()) {
-                      new BukkitPluginChannel(plugin, plugin.getServer().getOnlinePlayers().stream().findFirst().get(), new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
-                  }
-            } 
+                if (plugin.getServer().getOnlinePlayers().stream().findFirst().isPresent()) {
+                    new BukkitPluginChannel(plugin, plugin.getServer().getOnlinePlayers().stream().findFirst().get(), new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
+                }
+            }
             return true;
         }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -43,7 +38,7 @@ public class TeleportCommand implements CommandExecutor {
 
                 if (checkWarp(cs, args[0])) {
                     if (checkCooldown(p)) {
-                        if (plugin.config.load("warps", "config.yml").getInt("warmup") > 0) {
+                        if (plugin.warmupTime > 0) {
                             if (cs.hasPermission("masuitewarps.warmup.override")) {
                                 if (checkWarp(cs, args[0])) {
                                     send(args, p);
@@ -52,8 +47,8 @@ public class TeleportCommand implements CommandExecutor {
                                 }
                             }
                             MaSuiteWarps.warmups.add(p.getUniqueId());
-                            formator.sendMessage(cs, config.load("warps", "messages.yml").getString("teleportation-started").replace("%time%", String.valueOf(config.load("warps", "config.yml").getInt("warmup"))));
-                            new BukkitWarmup(config.load("warps", "config.yml").getInt("warmup"), plugin) {
+                            plugin.formator.sendMessage(cs, plugin.teleportationStarted.replace("%time%", String.valueOf(plugin.warmupTime)));
+                            new BukkitWarmup(plugin.warmupTime, plugin) {
                                 @Override
                                 public void count(int current) {
                                     if (current == 0) {
@@ -82,12 +77,12 @@ public class TeleportCommand implements CommandExecutor {
                         }
                     }
                 } else {
-                    formator.sendMessage(cs, config.load(null, "messages.yml").getString("no-permission"));
+                    plugin.formator.sendMessage(cs, plugin.noPermission);
                     plugin.in_command.remove(cs);
                     return;
                 }
             } else {
-                formator.sendMessage(cs, config.load("warps", "syntax.yml").getString("warp.teleport"));
+                plugin.formator.sendMessage(cs, plugin.teleportSyntax);
                 plugin.in_command.remove(cs);
                 return;
             }
@@ -117,20 +112,20 @@ public class TeleportCommand implements CommandExecutor {
         if (MaSuiteWarps.warps.containsKey(name.toLowerCase())) {
             return true;
         } else {
-            formator.sendMessage(cs, plugin.warpNotFound);
+            plugin.formator.sendMessage(cs, plugin.warpNotFound);
             return false;
         }
     }
 
     private Boolean checkCooldown(Player p) {
         if (plugin.getConfig().getInt("cooldown") > 0) {
-            if(p.hasPermission("masuitewarps.cooldown.override")) return true;
+            if (p.hasPermission("masuitewarps.cooldown.override")) return true;
             if (MaSuiteWarps.cooldowns.containsKey(p.getUniqueId())) {
-                if (System.currentTimeMillis() - MaSuiteWarps.cooldowns.get(p.getUniqueId()) > plugin.getConfig().getInt("cooldown") * 1000) {
+                if (System.currentTimeMillis() - MaSuiteWarps.cooldowns.get(p.getUniqueId()) > plugin.cooldownTime * 1000) {
                     MaSuiteWarps.cooldowns.remove(p.getUniqueId());
                     return true;
                 } else {
-                    formator.sendMessage(p, config.load("warps", "messages.yml").getString("in-cooldown").replace("%time%", plugin.config.load("warps", "config.yml").getString("cooldown")));
+                    plugin.formator.sendMessage(p, plugin.inCooldown.replace("%time%", String.valueOf(plugin.cooldownTime)));
                     return false;
                 }
             } else {
