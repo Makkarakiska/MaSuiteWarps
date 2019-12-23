@@ -4,13 +4,12 @@ import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
-import fi.matiaspaavilainen.masuitewarps.bungee.commands.Delete;
-import fi.matiaspaavilainen.masuitewarps.bungee.commands.List;
-import fi.matiaspaavilainen.masuitewarps.bungee.commands.Set;
-import fi.matiaspaavilainen.masuitewarps.bungee.commands.Teleport;
-import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
+import fi.matiaspaavilainen.masuitewarps.bungee.commands.*;
+import fi.matiaspaavilainen.masuitewarps.bungee.commands.TeleportController;
+import fi.matiaspaavilainen.masuitewarps.bungee.controllers.TeleportController;
+import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
+import fi.matiaspaavilainen.masuitewarps.core.services.WarpService;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -25,6 +24,8 @@ import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
+
+    public WarpService warpService;
 
     public HashMap<String, Warp> warps = new HashMap<>();
     public BungeeConfiguration config = new BungeeConfiguration();
@@ -60,13 +61,10 @@ public class MaSuiteWarps extends Plugin implements Listener {
         config.addDefault("warps/settings.yml", "warp-delay", 750);
         getProxy().getPluginManager().registerListener(this, this);
 
-        // Database
-
-        ConnectionManager.db.createTable("warps",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) UNIQUE NOT NULL, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, hidden TINYINT(1), global TINYINT(1)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        warpService = new WarpService(this);
 
 
-        new Warp().all().forEach(warp -> warps.put(warp.getName().toLowerCase(), warp));
+        //new Warp().all().forEach(warp -> warps.put(warp.getName().toLowerCase(), warp));
 
         // Send list of warp
         updateWarps();
@@ -103,6 +101,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
         Teleport teleport = new Teleport(this);
+        TeleportController teleportController = new TeleportController(this);
         if (subchannel.equals("ListWarps")) {
             String types = in.readUTF();
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
@@ -127,28 +126,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             sendCooldown(p);
         }
         if (subchannel.equals("WarpCommand")) {
-            String permissions = in.readUTF();
-            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
-            if (p == null) {
-                return;
-            }
-            String warp = in.readUTF();
-            if (warps.get(warp.toLowerCase()) == null) {
-                formator.sendMessage(p, warpNotFound);
-                return;
-            }
-            teleport.warp(p, warps.get(warp), "command", permissions, in.readBoolean());
-            sendCooldown(p);
-        }
-        if (subchannel.equals("WarpPlayerCommand")) {
-            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
-            String s = in.readUTF();
-            String warp = in.readUTF();
-            if (warps.get(warp.toLowerCase()) == null) {
-                formator.sendMessage(getProxy().getPlayer(s), warpNotFound);
-                return;
-            }
-            teleport.warp(p, s, warps.get(warp), "command");
+            teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean());
         }
         if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
@@ -191,13 +169,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
                     StringJoiner info = new StringJoiner(":");
                     Location loc = warp.getLocation();
                     info.add(warp.getName())
-                            .add(warp.getServer())
+                            .add(warp.getLocation().getServer())
                             .add(loc.getWorld())
                             .add(loc.getX().toString())
                             .add(loc.getY().toString())
                             .add(loc.getZ().toString())
-                            .add(warp.isGlobal().toString())
-                            .add(warp.isHidden().toString());
+                            .add(warp.isGlobal() + "")
+                            .add(warp.isHidden() + "");
                     for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
                         ServerInfo serverInfo = entry.getValue();
                         serverInfo.ping((result, error) -> {

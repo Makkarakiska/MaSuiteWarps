@@ -25,7 +25,7 @@ import java.util.*;
 public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public static HashSet<UUID> warmups = new HashSet<>();
-    public static HashMap<String, Warp> warps = new HashMap<>();
+    public HashMap<String, Warp> warps = new HashMap<>();
     public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public final List<CommandSender> in_command = new ArrayList<>();
 

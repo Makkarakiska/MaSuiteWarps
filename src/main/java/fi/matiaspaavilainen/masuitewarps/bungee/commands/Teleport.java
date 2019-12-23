@@ -3,7 +3,7 @@ package fi.matiaspaavilainen.masuitewarps.bungee.commands;
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
-import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
+import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -52,7 +52,7 @@ public class Teleport {
     }
 
     private boolean check(ProxiedPlayer p, Warp warp, boolean perm) {
-        if (warp.getServer() == null) {
+        if (warp.getLocation().getServer() == null) {
             plugin.formator.sendMessage(p, plugin.warpNotFound);
             return true;
         }
@@ -63,7 +63,7 @@ public class Teleport {
             }
         }
         if (!warp.isGlobal()) {
-            if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
+            if (!p.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
                 plugin.formator.sendMessage(p, plugin.warpInOtherServer);
                 return true;
             }
@@ -72,13 +72,13 @@ public class Teleport {
     }
 
     private void warpPlayer(ProxiedPlayer p, Warp warp) {
-        BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getServer()), new Object[]{
+        BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getLocation().getServer()), new Object[]{
                 "WarpPlayer",
                 p.getUniqueId().toString(),
                 warp.getLocation().getWorld() + ":" + warp.getLocation().getX() + ":" + warp.getLocation().getY() + ":" + warp.getLocation().getZ() + ":" + warp.getLocation().getYaw() + ":" + warp.getLocation().getPitch()
         });
-        if (!p.getServer().getInfo().getName().equals(warp.getServer())) {
-            p.connect(ProxyServer.getInstance().getServerInfo(warp.getServer()));
+        if (!p.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
+            p.connect(ProxyServer.getInstance().getServerInfo(warp.getLocation().getServer()));
             ProxyServer.getInstance().getScheduler().schedule(plugin, bsc::send, plugin.warpDelay, TimeUnit.MILLISECONDS);
         } else {
             bsc.send();
