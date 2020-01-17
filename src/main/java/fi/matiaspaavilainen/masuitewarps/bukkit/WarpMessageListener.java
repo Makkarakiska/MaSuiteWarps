@@ -1,7 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
-import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
+import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -12,7 +12,10 @@ import java.util.UUID;
 
 public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMessageListener {
 
-    WarpMessageListener(MaSuiteWarps plugin) {
+    private MaSuiteWarps plugin;
+
+    public WarpMessageListener(MaSuiteWarps plugin) {
+        this.plugin = plugin;
     }
 
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
@@ -44,17 +47,16 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
             if (subchannel.equals("CreateWarp")) {
                 String w = in.readUTF().toLowerCase();
                 String[] warp = w.split(":");
-                MaSuiteWarps.warps.put(warp[0].toLowerCase(), new Warp(warp[0], warp[1], new Location(warp[2], Double.parseDouble(warp[3]), Double.parseDouble(warp[4]), Double.parseDouble(warp[5])), Boolean.valueOf(warp[6]), Boolean.valueOf(warp[7])));
+                plugin.warps.put(warp[0].toLowerCase(), new Warp(warp[0], Boolean.valueOf(warp[6]), Boolean.valueOf(warp[7]), new Location(warp[1], warp[2], Double.parseDouble(warp[3]), Double.parseDouble(warp[4]), Double.parseDouble(warp[5]))));
             }
             if (subchannel.equals("WarpCooldown")) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
                 if (p == null) {
                     return;
                 }
-                MaSuiteWarps.cooldowns.put(p.getUniqueId(), in.readLong());
             }
             if (subchannel.equals("DelWarp")) {
-                MaSuiteWarps.warps.remove(in.readUTF());
+                plugin.warps.remove(in.readUTF());
 
             }
         } catch (IOException e) {

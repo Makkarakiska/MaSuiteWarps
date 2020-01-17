@@ -1,15 +1,13 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
+import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitewarps.bukkit.commands.DeleteCommand;
-import fi.matiaspaavilainen.masuitewarps.bukkit.commands.ListCommand;
-import fi.matiaspaavilainen.masuitewarps.bukkit.commands.SetCommand;
-import fi.matiaspaavilainen.masuitewarps.bukkit.commands.TeleportCommand;
-import fi.matiaspaavilainen.masuitewarps.core.objects.Warp;
-import org.bukkit.command.CommandSender;
+import fi.matiaspaavilainen.masuitecore.core.utils.CommandManagerUtil;
+import fi.matiaspaavilainen.masuitewarps.bukkit.commands.WarpCommand;
+import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +24,6 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public static HashSet<UUID> warmups = new HashSet<>();
     public HashMap<String, Warp> warps = new HashMap<>();
-    public static HashMap<UUID, Long> cooldowns = new HashMap<>();
-    public final List<CommandSender> in_command = new ArrayList<>();
 
     public BukkitConfiguration config = new BukkitConfiguration();
     public Formator formator = new Formator();
@@ -55,6 +51,18 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         config.create(this, "warps", "messages.yml");
         config.create(this, "warps", "syntax.yml");
 
+        PaperCommandManager manager = new PaperCommandManager(this);
+        manager.registerCommand(new WarpCommand(this));
+        manager.getCommandCompletions().registerCompletion("warps", c -> {
+            List<String> warpNames = new ArrayList<>();
+            for (Warp home : warps.values()) {
+                warpNames.add(home.getName());
+            }
+            return warpNames;
+        });
+
+        CommandManagerUtil.registerMaSuitePlayerCommandCompletion(manager);
+
         // Register listeners
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new WarpMessageListener(this));
@@ -63,9 +71,8 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Sign(this), this);
 
-        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60454"}).checkUpdates();
+        new Updator(getDescription().getVersion(), getDescription().getName(), "60454").checkUpdates();
 
-        registerCommands();
         requestWarps();
 
         warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
@@ -82,15 +89,6 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         deleteSyntax = config.load("warps", "syntax.yml").getString("warp.delete");
 
         onActiveCommand = config.load(null, "messages.yml").getString("on-active-command");
-    }
-
-    private void registerCommands() {
-        getCommand("warp").setExecutor(new TeleportCommand(this));
-        getCommand("warp").setTabCompleter(new TabCompleter(this));
-        getCommand("setwarp").setExecutor(new SetCommand(this));
-        getCommand("delwarp").setExecutor(new DeleteCommand(this));
-        getCommand("delwarp").setTabCompleter(new TabCompleter(this));
-        getCommand("warps").setExecutor(new ListCommand(this));
     }
 
     @EventHandler
@@ -112,7 +110,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         if (warps.isEmpty()) {
-            getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"RequestWarps"}).send(), 100);
+            getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), "RequestWarps").send(), 100);
         }
     }
 
@@ -121,8 +119,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
              DataOutputStream out = new DataOutputStream(b)) {
             out.writeUTF("RequestWarps");
             getServer().getScheduler().runTaskTimerAsynchronously(this, () -> getServer().sendPluginMessage(this, "BungeeCord", b.toByteArray()), 0, 3000);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -139,15 +136,5 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
             types.add("HIDDEN");
         }
         return types.toString();
-    }
-
-    public boolean checkCooldown(CommandSender cs, MaSuiteWarps plugin) {
-        if (plugin.in_command.contains(cs)) {
-            formator.sendMessage(cs, onActiveCommand);
-            return true;
-        }
-
-        plugin.in_command.add(cs);
-        return false;
     }
 }

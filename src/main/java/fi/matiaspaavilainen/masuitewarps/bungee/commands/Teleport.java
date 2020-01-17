@@ -71,18 +71,18 @@ public class Teleport {
         return false;
     }
 
-    private void warpPlayer(ProxiedPlayer p, Warp warp) {
-        BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getLocation().getServer()), new Object[]{
+    private void warpPlayer(ProxiedPlayer player, Warp warp) {
+        BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getLocation().getServer()),
                 "WarpPlayer",
-                p.getUniqueId().toString(),
+                player.getUniqueId().toString(),
                 warp.getLocation().getWorld() + ":" + warp.getLocation().getX() + ":" + warp.getLocation().getY() + ":" + warp.getLocation().getZ() + ":" + warp.getLocation().getYaw() + ":" + warp.getLocation().getPitch()
-        });
-        if (!p.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
-            p.connect(ProxyServer.getInstance().getServerInfo(warp.getLocation().getServer()));
+        );
+        if (!player.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
+            player.connect(ProxyServer.getInstance().getServerInfo(warp.getLocation().getServer()));
             ProxyServer.getInstance().getScheduler().schedule(plugin, bsc::send, plugin.warpDelay, TimeUnit.MILLISECONDS);
         } else {
             bsc.send();
         }
-        plugin.formator.sendMessage(p, plugin.teleported.replace("%warp%", warp.getName()));
+        plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
     }
 }

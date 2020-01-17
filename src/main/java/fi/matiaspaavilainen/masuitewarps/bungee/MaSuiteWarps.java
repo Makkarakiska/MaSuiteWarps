@@ -6,7 +6,6 @@ import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitewarps.bungee.commands.*;
-import fi.matiaspaavilainen.masuitewarps.bungee.commands.TeleportController;
 import fi.matiaspaavilainen.masuitewarps.bungee.controllers.TeleportController;
 import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import fi.matiaspaavilainen.masuitewarps.core.services.WarpService;
@@ -65,12 +64,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
 
         //new Warp().all().forEach(warp -> warps.put(warp.getName().toLowerCase(), warp));
+        warpService.initializeWarps();
 
         // Send list of warp
         updateWarps();
 
         // Updator
-        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60454"}).checkUpdates();
+        new Updator(getDescription().getVersion(), getDescription().getName(), "60454").checkUpdates();
 
         perWarpPermission = config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission");
         warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
@@ -108,7 +108,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (p == null) {
                 return;
             }
-            List list = new List(this);
+            ListController list = new ListController(this);
             list.listWarp(p, types);
         }
         if (subchannel.equals("WarpSign")) {
@@ -136,7 +136,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             String name = in.readUTF();
             String[] location = in.readUTF().split(":");
-            Set set = new Set(this);
+            SetController set = new SetController(this);
             if (i == 3) {
                 warps.put(name.toLowerCase(), set.setWarp(p, name,
                         new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF()));
@@ -153,7 +153,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (p == null) {
                 return;
             }
-            Delete delete = new Delete(this);
+            DeleteController delete = new DeleteController(this);
             String warpName = in.readUTF();
             delete.deleteWarp(p, warpName);
             warps.remove(warpName);
@@ -180,7 +180,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
                         ServerInfo serverInfo = entry.getValue();
                         serverInfo.ping((result, error) -> {
                             if (error == null) {
-                                new BungeePluginChannel(this, serverInfo, new Object[]{"CreateWarp", info.toString()}).send();
+                                new BungeePluginChannel(this, serverInfo, "CreateWarp", info.toString()).send();
                             }
                         });
                     }

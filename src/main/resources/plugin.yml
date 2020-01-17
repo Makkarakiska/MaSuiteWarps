@@ -4,20 +4,4 @@ version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
 softdepend: [Multiverse, Multiworld]
-api-version: 1.13
-commands:
-  warp:
-    description: Warps player to specified location
-    aliases: [warpto, tt]
-    permission: masuitewarps.warp
-  setwarp:
-    description: Creates warp point
-    aliases: [warpset, createwarp]
-    permission: masuitewarps.setwarp
-  delwarp:
-    description: Deletes warp point
-    aliases: [warpdel, deletewarp]
-    permission: masuitewarps.delwarp
-  warps:
-    description: Lists all available warps
-    aliases: [listwarps, warplist, tts]
+api-version: 1.15

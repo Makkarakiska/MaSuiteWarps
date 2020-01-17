@@ -20,7 +20,7 @@ public class TeleportCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
-        if (!(cs instanceof Player)) {
+        /*if (!(cs instanceof Player)) {
             if (checkWarp(cs, args[0])) {
                 if (plugin.getServer().getOnlinePlayers().stream().findFirst().isPresent()) {
                     new BukkitPluginChannel(plugin, plugin.getServer().getOnlinePlayers().stream().findFirst().get(), new Object[]{"WarpPlayerCommand", args[1], "console", args[0]}).send();
@@ -138,5 +138,7 @@ public class TeleportCommand implements CommandExecutor {
     private void sendLastLoc(Player p) {
         Location loc = p.getLocation();
         new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "GetLocation", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+    }*/
+        return true;
     }
 }
