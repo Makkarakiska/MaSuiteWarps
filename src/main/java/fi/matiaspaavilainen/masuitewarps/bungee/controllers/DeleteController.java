@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuitewarps.bungee.commands;
+package fi.matiaspaavilainen.masuitewarps.bungee.controllers;
 
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
