@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.core.models;
 
+import com.google.gson.Gson;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import lombok.*;
 
@@ -51,5 +52,13 @@ public class Warp {
 
     public boolean isGlobal() {
         return this.global;
+    }
+
+    public String serialize() {
+        return new Gson().toJson(this);
+    }
+
+    public Warp deserialize(String json) {
+        return new Gson().fromJson(json, Warp.class);
     }
 }
