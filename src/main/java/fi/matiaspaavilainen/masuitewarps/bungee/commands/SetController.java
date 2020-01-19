@@ -8,7 +8,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class SetController {
 
@@ -69,21 +68,11 @@ public class SetController {
             plugin.formator.sendMessage(player, plugin.warpCreated.replace("%warp%", warp.getName()));
         }
 
-        StringJoiner info = new StringJoiner(":");
-        Location loc = warp.getLocation();
-        info.add(warp.getName())
-                .add(warp.getLocation().getServer())
-                .add(loc.getWorld())
-                .add(loc.getX().toString())
-                .add(loc.getY().toString())
-                .add(loc.getZ().toString())
-                .add(String.valueOf(warp.isGlobal()))
-                .add(String.valueOf(warp.isHidden()));
         for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
             ServerInfo serverInfo = entry.getValue();
             serverInfo.ping((result, error) -> {
                 if (error == null) {
-                    new BungeePluginChannel(plugin, serverInfo, "CreateWarp", info.toString()).send();
+                    new BungeePluginChannel(plugin, serverInfo, "CreateWarp", warp.serialize()).send();
                 }
             });
         }
