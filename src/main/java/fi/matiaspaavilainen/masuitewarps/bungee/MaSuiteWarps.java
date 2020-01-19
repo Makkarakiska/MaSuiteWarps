@@ -5,9 +5,10 @@ import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
-import fi.matiaspaavilainen.masuitewarps.bungee.commands.*;
+import fi.matiaspaavilainen.masuitewarps.bungee.controllers.DeleteController;
+import fi.matiaspaavilainen.masuitewarps.bungee.controllers.ListController;
+import fi.matiaspaavilainen.masuitewarps.bungee.controllers.SetController;
 import fi.matiaspaavilainen.masuitewarps.bungee.controllers.TeleportController;
-import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import fi.matiaspaavilainen.masuitewarps.core.services.WarpService;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -17,16 +18,13 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
     public WarpService warpService;
 
-    public HashMap<String, Warp> warps = new HashMap<>();
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
 
@@ -100,7 +98,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
-        Teleport teleport = new Teleport(this);
         TeleportController teleportController = new TeleportController(this);
         if (subchannel.equals("ListWarps")) {
             String types = in.readUTF();
@@ -111,20 +108,18 @@ public class MaSuiteWarps extends Plugin implements Listener {
             ListController list = new ListController(this);
             list.listWarp(p, types);
         }
-        if (subchannel.equals("WarpSign")) {
+        // TODO: FIX Warp sign
+        /*if (subchannel.equals("WarpSign")) {
             String permissions = in.readUTF();
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
             String warp = in.readUTF();
-            if (warps.get(warp.toLowerCase()) == null) {
-                formator.sendMessage(p, warpNotFound);
-                return;
-            }
-            teleport.warp(p, warps.get(warp), "sign", permissions, in.readBoolean());
+
+            teleportController.teleportSign(p, warp, "sign", permissions, in.readBoolean());
             sendCooldown(p);
-        }
+        }*/
         if (subchannel.equals("WarpCommand")) {
             teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean());
         }
@@ -138,13 +133,11 @@ public class MaSuiteWarps extends Plugin implements Listener {
             String[] location = in.readUTF().split(":");
             SetController set = new SetController(this);
             if (i == 3) {
-                warps.put(name.toLowerCase(), set.setWarp(p, name,
-                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF()));
                 set.setWarp(p, name, new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF());
                 updateWarps();
             } else if (i == 2) {
-                warps.put(name.toLowerCase(), set.setWarp(p, name,
-                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5]))));
+                set.setWarp(p, name,
+                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])));
                 updateWarps();
             }
         }
@@ -156,7 +149,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
             DeleteController delete = new DeleteController(this);
             String warpName = in.readUTF();
             delete.deleteWarp(p, warpName);
-            warps.remove(warpName);
             updateWarps();
         }
         if (subchannel.equals("RequestWarps")) {
@@ -165,22 +157,12 @@ public class MaSuiteWarps extends Plugin implements Listener {
     }
 
     private void updateWarps() {
-        warps.forEach((name, warp) -> {
-                    StringJoiner info = new StringJoiner(":");
-                    Location loc = warp.getLocation();
-                    info.add(warp.getName())
-                            .add(warp.getLocation().getServer())
-                            .add(loc.getWorld())
-                            .add(loc.getX().toString())
-                            .add(loc.getY().toString())
-                            .add(loc.getZ().toString())
-                            .add(warp.isGlobal() + "")
-                            .add(warp.isHidden() + "");
+        this.warpService.getAllWarps().forEach(warp -> {
                     for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
                         ServerInfo serverInfo = entry.getValue();
                         serverInfo.ping((result, error) -> {
                             if (error == null) {
-                                new BungeePluginChannel(this, serverInfo, "CreateWarp", info.toString()).send();
+                                new BungeePluginChannel(this, serverInfo, "CreateWarp", warp.serialize()).send();
                             }
                         });
                     }
