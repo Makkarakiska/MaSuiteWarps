@@ -4,14 +4,12 @@ import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.utils.HibernateUtil;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class WarpService {
@@ -25,19 +23,31 @@ public class WarpService {
         this.plugin = plugin;
     }
 
+    /**
+     * Teleports {@link ProxiedPlayer} to {@link Warp}
+     *
+     * @param player player to teleport
+     * @param warp   target warp
+     */
     public void teleportToWarp(ProxiedPlayer player, Warp warp) {
         this.teleport(player, warp);
     }
 
+    /**
+     * Teleports {@link ProxiedPlayer} to {@link Warp}
+     *
+     * @param player player to teleport
+     * @param warp   target warp
+     */
     private void teleport(ProxiedPlayer player, Warp warp) {
         BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getLocation().getServer()),
                 "WarpPlayer",
                 player.getUniqueId().toString(),
-                warp.getLocation().getWorld() + ":" + warp.getLocation().getX() + ":" + warp.getLocation().getY() + ":" + warp.getLocation().getZ() + ":" + warp.getLocation().getYaw() + ":" + warp.getLocation().getPitch()
+                warp.getLocation().serialize()
         );
         if (!player.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
-            player.connect(ProxyServer.getInstance().getServerInfo(warp.getLocation().getServer()));
-            ProxyServer.getInstance().getScheduler().schedule(plugin, bsc::send, plugin.warpDelay, TimeUnit.MILLISECONDS);
+            player.connect(plugin.getProxy().getServerInfo(warp.getLocation().getServer()));
+            plugin.getProxy().getScheduler().schedule(plugin, bsc::send, plugin.warpDelay, TimeUnit.MILLISECONDS);
         } else {
             bsc.send();
         }
@@ -106,6 +116,9 @@ public class WarpService {
         return true;
     }
 
+    /**
+     * Initialize warps for use
+     */
     public void initializeWarps() {
         List<Warp> warpList = entityManager.createQuery("SELECT w FROM Warp w", Warp.class).getResultList();
         warpList.forEach(warp -> warps.put(warp.getName(), warp));
