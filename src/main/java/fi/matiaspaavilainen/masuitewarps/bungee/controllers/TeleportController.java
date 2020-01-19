@@ -1,12 +1,10 @@
 package fi.matiaspaavilainen.masuitewarps.bungee.controllers;
 
-import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class TeleportController {
-    private Utils utils = new Utils();
     private MaSuiteWarps plugin;
 
     public TeleportController(MaSuiteWarps p) {
