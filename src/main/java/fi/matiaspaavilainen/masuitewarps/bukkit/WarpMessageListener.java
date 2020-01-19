@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
+import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
 import org.bukkit.Bukkit;
@@ -32,22 +33,21 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                 if (p == null) {
                     return;
                 }
-                String[] loc = in.readUTF().split(":");
-                if (Bukkit.getWorld(loc[0]) == null) {
-                    System.out.println("[MaSuite] [Warps] [World=" + loc[0] + "] World  could not be found!");
+                String stringLoc = in.readUTF();
+                System.out.println(stringLoc);
+                Location loc = new Location().deserialize(stringLoc);
+
+                org.bukkit.Location bukkitLocation = BukkitAdapter.adapt(loc);
+                if (bukkitLocation.getWorld() == null) {
+                    System.out.println("[MaSuite] [Warps] [World=" + loc.getWorld() + "] World  could not be found!");
                     return;
                 }
-                p.teleport(new org.bukkit.Location(Bukkit.getWorld(loc[0]),
-                        Double.parseDouble(loc[1]),
-                        Double.parseDouble(loc[2]),
-                        Double.parseDouble(loc[3]),
-                        Float.parseFloat(loc[4]),
-                        Float.parseFloat(loc[5])));
+                p.teleport(bukkitLocation);
             }
             if (subchannel.equals("CreateWarp")) {
-                String w = in.readUTF().toLowerCase();
-                String[] warp = w.split(":");
-                plugin.warps.put(warp[0].toLowerCase(), new Warp(warp[0], Boolean.valueOf(warp[6]), Boolean.valueOf(warp[7]), new Location(warp[1], warp[2], Double.parseDouble(warp[3]), Double.parseDouble(warp[4]), Double.parseDouble(warp[5]))));
+                Warp warp = new Warp();
+                warp = warp.deserialize(in.readUTF().toLowerCase());
+                plugin.warps.put(warp.getName(), warp);
             }
             if (subchannel.equals("WarpCooldown")) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
@@ -57,7 +57,6 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
             }
             if (subchannel.equals("DelWarp")) {
                 plugin.warps.remove(in.readUTF());
-
             }
         } catch (IOException e) {
             e.printStackTrace();
