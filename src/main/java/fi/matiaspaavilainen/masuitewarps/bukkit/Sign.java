@@ -68,7 +68,7 @@ public class Sign implements Listener {
                 if (p.hasPermission("masuitewarps.warp.to." + ChatColor.stripColor(sign.getLine(getWarpLine()))) || p.hasPermission("masuitewarps.warp.to.*")) {
                     hasPerm = true;
                 }
-                new BukkitPluginChannel(plugin, p, new Object[]{"WarpSign", types.toString(), p.getName(), ChatColor.stripColor(sign.getLine(getWarpLine())), hasPerm}).send();
+                new BukkitPluginChannel(plugin, p, "WarpSign", types.toString(), p.getName(), ChatColor.stripColor(sign.getLine(getWarpLine())), hasPerm).send();
             }
 
         }
