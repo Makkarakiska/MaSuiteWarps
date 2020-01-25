@@ -61,7 +61,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
         warpService = new WarpService(this);
 
 
-        //new Warp().all().forEach(warp -> warps.put(warp.getName().toLowerCase(), warp));
         warpService.initializeWarps();
 
         // Send list of warp
@@ -130,14 +129,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
                 return;
             }
             String name = in.readUTF();
-            String[] location = in.readUTF().split(":");
+            Location location = new Location().deserialize(in.readUTF());
             SetController set = new SetController(this);
             if (i == 3) {
-                set.setWarp(p, name, new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])), in.readUTF());
+                set.setWarp(p, name, location, in.readUTF());
                 updateWarps();
             } else if (i == 2) {
-                set.setWarp(p, name,
-                        new Location(location[0], Double.parseDouble(location[1]), Double.parseDouble(location[2]), Double.parseDouble(location[3]), Float.parseFloat(location[4]), Float.parseFloat(location[5])));
+                set.setWarp(p, name, location);
                 updateWarps();
             }
         }

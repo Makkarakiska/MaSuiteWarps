@@ -3,6 +3,7 @@ package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
 import fi.matiaspaavilainen.masuitecore.acf.BaseCommand;
 import fi.matiaspaavilainen.masuitecore.acf.annotation.*;
 import fi.matiaspaavilainen.masuitecore.acf.bukkit.contexts.OnlinePlayer;
+import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Location;
@@ -36,7 +37,7 @@ public class WarpCommand extends BaseCommand {
     @CommandCompletion("@warps hidden|global")
     public void setWarpCommand(Player player, @Single String name, @Optional @Single String setting) {
         Location loc = player.getLocation();
-        String stringLocation = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
+        String stringLocation = BukkitAdapter.adapt(loc).serialize();
         if (setting == null) {
             new BukkitPluginChannel(plugin, player, "SetWarp", 2, player.getName(), name, stringLocation).send();
             return;
