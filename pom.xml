@@ -62,13 +62,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.15.1-R0.1-SNAPSHOT</version>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>fi.matiaspaavilainen</groupId>
             <artifactId>MaSuiteCore</artifactId>
-            <version>2.0-20200120.181502-17</version>
+            <version>2.0.0-20200125.184711-2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
