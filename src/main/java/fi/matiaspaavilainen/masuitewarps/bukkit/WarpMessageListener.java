@@ -34,7 +34,6 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                     return;
                 }
                 String stringLoc = in.readUTF();
-                System.out.println(stringLoc);
                 Location loc = new Location().deserialize(stringLoc);
 
                 org.bukkit.Location bukkitLocation = BukkitAdapter.adapt(loc);
