@@ -43,15 +43,15 @@ public class WarpCommand extends BaseCommand {
         }
 
         if (setting.equalsIgnoreCase("hidden") || setting.equalsIgnoreCase("global")) {
-            if (setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.setwarp.hidden")) {
+            if (setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.hidden")) {
                 plugin.formator.sendMessage(player, plugin.noPermission);
                 return;
             }
-            if (setting.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.setwarp.global")) {
+            if (setting.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.warp.set.global")) {
                 plugin.formator.sendMessage(player, plugin.noPermission);
                 return;
             }
-            if (!setting.equalsIgnoreCase("global") && !setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.setwarp.server")) {
+            if (!setting.equalsIgnoreCase("global") && !setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.server")) {
                 plugin.formator.sendMessage(player, plugin.noPermission);
                 return;
             }
@@ -69,7 +69,7 @@ public class WarpCommand extends BaseCommand {
 
     @CommandAlias("warps|listwarps|warplist")
     @CommandPermission("masuitewarps.warp.list")
-    @Description("Deletes a warp")
+    @Description("Lists all of the warps")
     @CommandCompletion("@warps")
     public void listWarpCommand(Player player) {
         new BukkitPluginChannel(plugin, player, "ListWarps", plugin.checkPermissions(player), player.getName()).send();
