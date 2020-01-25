@@ -43,15 +43,15 @@ public class WarpCommand extends BaseCommand {
         }
 
         if (setting.equalsIgnoreCase("hidden") || setting.equalsIgnoreCase("global")) {
-            if (setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarp.setwarp.hidden")) {
+            if (setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.setwarp.hidden")) {
                 plugin.formator.sendMessage(player, plugin.noPermission);
                 return;
             }
-            if (setting.equalsIgnoreCase("global") && !player.hasPermission("masuitewarp.setwarp.global")) {
+            if (setting.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.setwarp.global")) {
                 plugin.formator.sendMessage(player, plugin.noPermission);
                 return;
             }
-            if (!setting.equalsIgnoreCase("global") && !setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarp.setwarp.server")) {
+            if (!setting.equalsIgnoreCase("global") && !setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.setwarp.server")) {
                 plugin.formator.sendMessage(player, plugin.noPermission);
                 return;
             }
