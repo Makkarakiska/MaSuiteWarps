@@ -1,6 +1,7 @@
 package fi.matiaspaavilainen.masuitewarps.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
+import fi.matiaspaavilainen.masuitecore.bukkit.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
@@ -37,10 +38,6 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     public int cooldownTime = 0;
     public int warmupTime = 0;
 
-    public String teleportSyntax = "";
-    public String setSyntax = "";
-    public String deleteSyntax = "";
-
     public String onActiveCommand = "";
 
     @Override
@@ -49,7 +46,6 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         // Create configs
         config.create(this, "warps", "config.yml");
         config.create(this, "warps", "messages.yml");
-        config.create(this, "warps", "syntax.yml");
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new WarpCommand(this));
@@ -62,6 +58,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         });
 
         CommandManagerUtil.registerMaSuitePlayerCommandCompletion(manager);
+        CommandManagerUtil.registerCooldownCondition(manager);
 
         // Register listeners
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -84,11 +81,9 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         inCooldown = config.load("warps", "config.yml").getString("cooldown");
         warmupTime = config.load("warps", "config.yml").getInt("warmup");
 
-        teleportSyntax = config.load("warps", "syntax.yml").getString("warp.teleport");
-        setSyntax = config.load("warps", "syntax.yml").getString("warp.set");
-        deleteSyntax = config.load("warps", "syntax.yml").getString("warp.delete");
-
         onActiveCommand = config.load(null, "messages.yml").getString("on-active-command");
+
+        MaSuiteCore.cooldownService.addCooldownLength("warps", config.load("warps", "config.yml").getInt("cooldown"));
     }
 
     @EventHandler

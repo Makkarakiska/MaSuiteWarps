@@ -47,7 +47,10 @@ public class WarpService {
         );
         if (!player.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
             player.connect(plugin.getProxy().getServerInfo(warp.getLocation().getServer()));
-            plugin.getProxy().getScheduler().schedule(plugin, bsc::send, plugin.warpDelay, TimeUnit.MILLISECONDS);
+            plugin.getProxy().getScheduler().schedule(plugin, () -> {
+                bsc.send();
+                plugin.utils.applyCooldown(plugin, player.getUniqueId(), "warps");
+            }, plugin.warpDelay, TimeUnit.MILLISECONDS);
         } else {
             bsc.send();
         }

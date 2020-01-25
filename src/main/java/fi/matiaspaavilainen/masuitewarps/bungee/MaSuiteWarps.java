@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuitewarps.bungee;
 
+import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
@@ -25,6 +26,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
     public WarpService warpService;
 
+    public Utils utils = new Utils();
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
 
