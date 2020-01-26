@@ -22,5 +22,6 @@ If you need support please check out the [wiki](https://github.com/masagameplay/
     - [x] Listing the warps
 - [x] Cooldown
 - [ ] Warmup
+- [ ] Warp signs
 - [ ] Testing
 - [ ] Release on SpigotMC
