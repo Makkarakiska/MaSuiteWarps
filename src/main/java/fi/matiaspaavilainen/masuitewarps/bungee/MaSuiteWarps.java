@@ -51,6 +51,11 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
     public int warpDelay = 500;
 
+    private TeleportController teleportController = new TeleportController(this);
+    private SetController set = new SetController(this);
+    private DeleteController delete = new DeleteController(this);
+    private ListController list = new ListController(this);
+
     @Override
     public void onEnable() {
         // Configuration
@@ -99,14 +104,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
-        TeleportController teleportController = new TeleportController(this);
+
         if (subchannel.equals("ListWarps")) {
             String types = in.readUTF();
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
-            ListController list = new ListController(this);
             list.listWarp(p, types);
         }
         // TODO: FIX Warp sign
@@ -132,7 +136,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             String name = in.readUTF();
             Location location = new Location().deserialize(in.readUTF());
-            SetController set = new SetController(this);
+
             if (i == 3) {
                 set.setWarp(p, name, location, in.readUTF());
                 updateWarps();
@@ -146,9 +150,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (p == null) {
                 return;
             }
-            DeleteController delete = new DeleteController(this);
-            String warpName = in.readUTF();
-            delete.deleteWarp(p, warpName);
+            delete.deleteWarp(p, in.readUTF());
             updateWarps();
         }
         if (subchannel.equals("RequestWarps")) {
