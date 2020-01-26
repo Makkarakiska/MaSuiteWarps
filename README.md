@@ -7,7 +7,7 @@ MaSuiteWarps gives you and your playerbase easy to use warp system with hidden, 
 
 **Please note that this is a rewrite branch so things might change a little bit over time**
 
-##### What is MaSuite?
+#### What is MaSuite?
 MaSuite is alternative solution for ProxySuite and BungeeSuite. It contains [chat](https://github.com/masagameplay/MaSuiteChat), [homes](https://github.com/masagameplay/MaSuiteHomes), [warps](https://github.com/masagameplay/MaSuiteWarps), [portals](https://github.com/masagameplay/MaSuitePortals) and [teleports](https://github.com/masagameplay/MaSuiteTeleports).
 
 #### Useful links
