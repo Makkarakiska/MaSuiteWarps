@@ -1,8 +1,7 @@
 ![MaSuiteWarps logo](https://i.imgur.com/AzIQDiN.png)
 
 
-## MaSuiteWarps
-***
+# MaSuiteWarps
 MaSuiteWarps gives you and your playerbase easy to use warp system with hidden, server and global warps. It also includes cooldowns and warmups for commands which are toggleable from configs!
 
 **Please note that this is a rewrite branch so things might change a little bit over time**
