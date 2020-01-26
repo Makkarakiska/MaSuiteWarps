@@ -16,11 +16,12 @@ You can get the latest stable version from [SpigotMC](https://www.spigotmc.org/r
 If you need support please check out the [wiki](https://github.com/masagameplay/MaSuiteWarps/wiki) or join my [Discord](https://discord.gg/8t36vS)
 
 #### TODO:
-[x] Creating and updating a warp
-[x] Teleporting to a warp
-[x] Deleting a warp
-[x] Listing the warps
-[x] Cooldown
-[ ] Warmup
-[ ] Testing
-[ ] Release on SpigotMC
+- [x] Basic functionality
+    - [x] Creating and updating a warp
+    - [x] Teleporting to a warp
+    - [x] Deleting a warp
+    - [x] Listing the warps
+- [x] Cooldown
+- [ ] Warmup
+- [ ] Testing
+- [ ] Release on SpigotMC
