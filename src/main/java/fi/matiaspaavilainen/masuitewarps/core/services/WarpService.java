@@ -4,12 +4,14 @@ import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.utils.HibernateUtil;
 import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
 import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class WarpService {
@@ -83,11 +85,13 @@ public class WarpService {
      * @return returns created warp
      */
     public Warp createWarp(Warp warp) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(warp);
-        entityManager.getTransaction().commit();
+        plugin.getProxy().getScheduler().runAsync(plugin, () -> {
+            entityManager.getTransaction().begin();
+            entityManager.persist(warp);
+            entityManager.getTransaction().commit();
+        });
         warps.put(warp.getName(), warp);
-
+        this.sendWarpToServers(warp);
         return warp;
     }
 
@@ -98,11 +102,14 @@ public class WarpService {
      * @return returns updated warp
      */
     public Warp updateWarp(Warp warp) {
-        entityManager.getTransaction().begin();
-        entityManager.merge(warp);
-        entityManager.getTransaction().commit();
+        plugin.getProxy().getScheduler().runAsync(plugin, () -> {
+            entityManager.getTransaction().begin();
+            entityManager.merge(warp);
+            entityManager.getTransaction().commit();
+        });
         warps.put(warp.getName(), warp);
 
+        this.sendWarpToServers(warp);
         return warp;
     }
 
@@ -112,9 +119,21 @@ public class WarpService {
      * @param warp warp to remove
      */
     public boolean removeWarp(Warp warp) {
-        entityManager.getTransaction().begin();
-        entityManager.remove(warp);
-        entityManager.getTransaction().commit();
+        plugin.getProxy().getScheduler().runAsync(plugin, () -> {
+            entityManager.getTransaction().begin();
+            entityManager.remove(warp);
+            entityManager.getTransaction().commit();
+
+            for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
+                ServerInfo serverInfo = entry.getValue();
+                serverInfo.ping((result, error) -> {
+                    if (error == null) {
+                        new BungeePluginChannel(plugin, serverInfo, "DeleteWarp", warp.getName()).send();
+                    }
+                });
+            }
+        });
+
         warps.remove(warp.getName());
         return true;
     }
@@ -144,5 +163,30 @@ public class WarpService {
         }
 
         return warp;
+    }
+
+    /**
+     * Sends a list of warp to every server
+     */
+    public void sendAllWarpsToServers() {
+        this.getAllWarps().forEach(this::sendWarpToServers);
+    }
+
+    /**
+     * Send a {@link Warp} to every server
+     *
+     * @param warp warp to send
+     */
+    public void sendWarpToServers(Warp warp) {
+        plugin.getProxy().getScheduler().runAsync(plugin, () -> {
+            for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
+                ServerInfo serverInfo = entry.getValue();
+                serverInfo.ping((result, error) -> {
+                    if (error == null) {
+                        new BungeePluginChannel(plugin, serverInfo, "CreateWarp", warp.serialize()).send();
+                    }
+                });
+            }
+        });
     }
 }
