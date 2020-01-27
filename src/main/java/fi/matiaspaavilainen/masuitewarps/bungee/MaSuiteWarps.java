@@ -3,7 +3,6 @@ package fi.matiaspaavilainen.masuitewarps.bungee;
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
-import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitewarps.bungee.controllers.DeleteController;
@@ -11,16 +10,15 @@ import fi.matiaspaavilainen.masuitewarps.bungee.controllers.ListController;
 import fi.matiaspaavilainen.masuitewarps.bungee.controllers.SetController;
 import fi.matiaspaavilainen.masuitewarps.bungee.controllers.TeleportController;
 import fi.matiaspaavilainen.masuitewarps.core.services.WarpService;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.io.*;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
@@ -71,7 +69,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
         warpService.initializeWarps();
 
         // Send list of warp
-        updateWarps();
+        this.warpService.sendAllWarpsToServers();
 
         // Updator
         new Updator(getDescription().getVersion(), getDescription().getName(), "60454").checkUpdates();
@@ -139,10 +137,8 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
             if (i == 3) {
                 set.setWarp(p, name, location, in.readUTF());
-                updateWarps();
             } else if (i == 2) {
                 set.setWarp(p, name, location);
-                updateWarps();
             }
         }
         if (subchannel.equals("DelWarp")) {
@@ -151,37 +147,9 @@ public class MaSuiteWarps extends Plugin implements Listener {
                 return;
             }
             delete.deleteWarp(p, in.readUTF());
-            updateWarps();
         }
         if (subchannel.equals("RequestWarps")) {
-            updateWarps();
-        }
-    }
-
-    private void updateWarps() {
-        this.warpService.getAllWarps().forEach(warp -> {
-                    for (Map.Entry<String, ServerInfo> entry : getProxy().getServers().entrySet()) {
-                        ServerInfo serverInfo = entry.getValue();
-                        serverInfo.ping((result, error) -> {
-                            if (error == null) {
-                                new BungeePluginChannel(this, serverInfo, "CreateWarp", warp.serialize()).send();
-                            }
-                        });
-                    }
-
-                }
-        );
-    }
-
-    private void sendCooldown(ProxiedPlayer p) {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("WarpCooldown");
-            out.writeUTF(p.getUniqueId().toString());
-            out.writeLong(System.currentTimeMillis());
-            getProxy().getScheduler().schedule(this, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
-        } catch (IOException e) {
-            e.printStackTrace();
+            this.warpService.sendAllWarpsToServers();
         }
     }
 }
