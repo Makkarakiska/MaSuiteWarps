@@ -33,8 +33,7 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                 if (p == null) {
                     return;
                 }
-                String stringLoc = in.readUTF();
-                Location loc = new Location().deserialize(stringLoc);
+                Location loc = new Location().deserialize(in.readUTF());
 
                 org.bukkit.Location bukkitLocation = BukkitAdapter.adapt(loc);
                 if (bukkitLocation.getWorld() == null) {
