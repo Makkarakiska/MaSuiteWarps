@@ -23,6 +23,6 @@ If you need support please check out the [wiki](https://github.com/masagameplay/
 - [x] Cooldown
 - [ ] Better syntax
 - [ ] Warmup
-- [ ] Warp signs
+- [x] Warp signs
 - [ ] Testing
 - [ ] Release on SpigotMC
