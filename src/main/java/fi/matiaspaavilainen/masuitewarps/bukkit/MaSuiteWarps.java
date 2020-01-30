@@ -9,7 +9,6 @@ import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.utils.CommandManagerUtil;
 import fi.matiaspaavilainen.masuitewarps.bukkit.commands.WarpCommand;
 import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,7 +22,6 @@ import java.util.*;
 
 public class MaSuiteWarps extends JavaPlugin implements Listener {
 
-    public static HashSet<UUID> warmups = new HashSet<>();
     public HashMap<String, Warp> warps = new HashMap<>();
 
     public BukkitConfiguration config = new BukkitConfiguration();
@@ -38,7 +36,9 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
     public int cooldownTime = 0;
     public int warmupTime = 0;
 
-    public String onActiveCommand = "";
+    private boolean requestedPerServerWarps = false;
+    public boolean perServerWarps = false;
+
 
     @Override
     public void onEnable() {
@@ -51,8 +51,11 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         manager.registerCommand(new WarpCommand(this));
         manager.getCommandCompletions().registerCompletion("warps", c -> {
             List<String> warpNames = new ArrayList<>();
-            for (Warp home : warps.values()) {
-                warpNames.add(home.getName());
+            for (Warp warp : warps.values()) {
+                if(perServerWarps && (!c.getPlayer().hasPermission("masuitewarps.warp.to." + warp.getName()) || !(c.getPlayer().hasPermission("masuitewarps.warp.to.*")))){
+                    continue;
+                }
+                warpNames.add(warp.getName());
             }
             return warpNames;
         });
@@ -81,8 +84,6 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         inCooldown = config.load("warps", "config.yml").getString("cooldown");
         warmupTime = config.load("warps", "config.yml").getInt("warmup");
 
-        onActiveCommand = config.load(null, "messages.yml").getString("on-active-command");
-
         MaSuiteCore.cooldownService.addCooldownLength("warps", config.load("warps", "config.yml").getInt("cooldown"));
     }
 
@@ -106,6 +107,10 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         if (warps.isEmpty()) {
             getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), "RequestWarps").send(), 100);
         }
+        if (!requestedPerServerWarps) {
+            getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), "CheckPerWarpFlag", e.getPlayer().getName()).send(), 100);
+            requestedPerServerWarps = true;
+        }
     }
 
     private void requestWarps() {
@@ -116,19 +121,5 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public String checkPermissions(Player p) {
-        StringJoiner types = new StringJoiner("");
-        if (p.hasPermission("masuitewarps.list.global")) {
-            types.add("GLOBAL");
-        }
-        if (p.hasPermission("masuitewarps.list.server")) {
-            types.add("SERVER");
-        }
-        if (p.hasPermission("masuitewarps.list.hidden")) {
-            types.add("HIDDEN");
-        }
-        return types.toString();
     }
 }
