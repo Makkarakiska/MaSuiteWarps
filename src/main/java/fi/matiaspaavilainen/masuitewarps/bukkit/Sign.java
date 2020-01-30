@@ -56,7 +56,7 @@ public class Sign implements Listener {
 
                 String warp = ChatColor.stripColor(sign.getLine(getWarpLine()));
 
-                new BukkitPluginChannel(plugin, player, "WarpCommand", player.getName(), warp,
+                new BukkitPluginChannel(plugin, player, "Warp", player.getName(), warp,
                         player.hasPermission("masuitewarps.warp.sign.global"),
                         player.hasPermission("masuitewarps.warp.sign.server"),
                         player.hasPermission("masuitewarps.warp.sign.hidden")).send();

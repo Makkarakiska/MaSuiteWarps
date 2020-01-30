@@ -25,7 +25,7 @@ public class WarpCommand extends BaseCommand {
     @Conditions("cooldown:type=warps,bypass=masuitewarps.cooldown.override")
     public void teleportWarpCommand(CommandSender sender, @Single String name, @Optional @Single @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer) {
         if (!(sender instanceof Player) || onlinePlayer != null) {
-            new BukkitPluginChannel(plugin, onlinePlayer.player, "WarpCommand", onlinePlayer.player.getName(), name, true, true, true).send();
+            new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true).send();
             return;
         }
         Player player = (Player) sender;
@@ -38,7 +38,7 @@ public class WarpCommand extends BaseCommand {
             }
         }
 
-        new BukkitPluginChannel(plugin, player, "WarpCommand", player.getName(), name.toLowerCase(),
+        new BukkitPluginChannel(plugin, player, "Warp", player.getName(), name.toLowerCase(),
                 player.hasPermission("masuitewarps.warp.global"),
                 player.hasPermission("masuitewarps.warp.server"),
                 player.hasPermission("masuitewarps.warp.hidden")).send();
