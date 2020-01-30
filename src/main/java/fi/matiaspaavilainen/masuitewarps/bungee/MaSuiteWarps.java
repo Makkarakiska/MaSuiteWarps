@@ -3,6 +3,7 @@ package fi.matiaspaavilainen.masuitewarps.bungee;
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitewarps.bungee.controllers.DeleteController;
@@ -104,28 +105,22 @@ public class MaSuiteWarps extends Plugin implements Listener {
         String subchannel = in.readUTF();
 
         if (subchannel.equals("ListWarps")) {
-            String types = in.readUTF();
-            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
-            if (p == null) {
+            ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
+            if (player == null) {
                 return;
             }
-            list.listWarp(p, types);
+            list.listWarp(player, in.readBoolean(), in.readBoolean(), in.readBoolean());
         }
-        // TODO: FIX Warp sign
-        /*if (subchannel.equals("WarpSign")) {
-            String permissions = in.readUTF();
-            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
-            if (p == null) {
-                return;
-            }
-            String warp = in.readUTF();
 
-            teleportController.teleportSign(p, warp, "sign", permissions, in.readBoolean());
-            sendCooldown(p);
-        }*/
-        if (subchannel.equals("WarpCommand")) {
-            teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean());
+        if (subchannel.equals("Warp")) {
+            teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean(), in.readBoolean(), in.readBoolean());
         }
+
+        if (subchannel.equals("CheckPerWarpFlag")) {
+            ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
+            new BungeePluginChannel(this, player.getServer().getInfo(), "SetPerWarpFlag", perWarpPermission).send();
+        }
+
         if (subchannel.equals("SetWarp")) {
             int i = in.readInt();
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
