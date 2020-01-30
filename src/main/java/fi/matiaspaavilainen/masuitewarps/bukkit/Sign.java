@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class Sign implements Listener {
 
@@ -49,26 +48,18 @@ public class Sign implements Listener {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-        Player p = e.getPlayer();
-        Block b = e.getClickedBlock();
-        if (b.getType().toString().contains("SIGN")) {
-            org.bukkit.block.Sign sign = (org.bukkit.block.Sign) b.getState();
+        Player player = e.getPlayer();
+        Block block = e.getClickedBlock();
+        if (block != null && block.getType().toString().contains("SIGN")) {
+            org.bukkit.block.Sign sign = (org.bukkit.block.Sign) block.getState();
             if (checkSign(sign)) {
-                StringJoiner types = new StringJoiner("");
-                if (p.hasPermission("masuitewarps.warp.sign.global")) {
-                    types.add("GLOBAL");
-                }
-                if (p.hasPermission("masuitewarps.warp.sign.server")) {
-                    types.add("SERVER");
-                }
-                if (p.hasPermission("masuitewarps.warp.sign.hidden")) {
-                    types.add("HIDDEN");
-                }
-                boolean hasPerm = false;
-                if (p.hasPermission("masuitewarps.warp.to." + ChatColor.stripColor(sign.getLine(getWarpLine()))) || p.hasPermission("masuitewarps.warp.to.*")) {
-                    hasPerm = true;
-                }
-                new BukkitPluginChannel(plugin, p, "WarpSign", types.toString(), p.getName(), ChatColor.stripColor(sign.getLine(getWarpLine())), hasPerm).send();
+
+                String warp = ChatColor.stripColor(sign.getLine(getWarpLine()));
+
+                new BukkitPluginChannel(plugin, player, "WarpCommand", player.getName(), warp,
+                        player.hasPermission("masuitewarps.warp.sign.global"),
+                        player.hasPermission("masuitewarps.warp.sign.server"),
+                        player.hasPermission("masuitewarps.warp.sign.hidden")).send();
             }
 
         }
