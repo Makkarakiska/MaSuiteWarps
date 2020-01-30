@@ -11,19 +11,11 @@ public class TeleportController {
         plugin = p;
     }
 
-    public void teleport(ProxiedPlayer player, String name, boolean hasAccessToHidden) {
-        Warp warp = plugin.warpService.getWarp(name);
-        if (checkWarp(player, warp, true, true, hasAccessToHidden)) {
-            plugin.warpService.teleportToWarp(player, warp);
-        }
-    }
-
-    public void teleportSign(ProxiedPlayer player, String name, boolean hasAccessToGlobal, boolean hasAccessToServer, boolean hasAccessToHidden) {
+    public void teleport(ProxiedPlayer player, String name, boolean hasAccessToGlobal, boolean hasAccessToServer, boolean hasAccessToHidden) {
         Warp warp = plugin.warpService.getWarp(name);
         if (checkWarp(player, warp, hasAccessToGlobal, hasAccessToServer, hasAccessToHidden)) {
             plugin.warpService.teleportToWarp(player, warp);
         }
-
     }
 
     private boolean checkWarp(ProxiedPlayer player, Warp warp, boolean hasAccessToGlobal, boolean hasAccessToServer, boolean hasAccessToHidden) {
