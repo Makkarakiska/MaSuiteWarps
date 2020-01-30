@@ -23,13 +23,25 @@ public class WarpCommand extends BaseCommand {
     @Description("Warps to target")
     @CommandCompletion("@warps @masuite_players")
     @Conditions("cooldown:type=warps,bypass=masuitewarps.cooldown.override")
-    public void teleportWarpCommand(CommandSender sender, @Single String warp, @Optional @Single @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer) {
+    public void teleportWarpCommand(CommandSender sender, @Single String name, @Optional @Single @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer) {
         if (!(sender instanceof Player) || onlinePlayer != null) {
-            new BukkitPluginChannel(plugin, onlinePlayer.player, "WarpCommand", onlinePlayer.player.getName(), warp, true).send();
+            new BukkitPluginChannel(plugin, onlinePlayer.player, "WarpCommand", onlinePlayer.player.getName(), name, true, true, true).send();
             return;
         }
         Player player = (Player) sender;
-        new BukkitPluginChannel(plugin, player, "WarpCommand", player.getName(), warp.toLowerCase(), player.hasPermission("masuitewarps.warp.hidden")).send();
+
+        // Check if player has permission to teleport to warp if per server warps is enabled
+        if (plugin.perServerWarps) {
+            if (!player.hasPermission("masuitewarps.warp.to." + name) && !player.hasPermission("masuitewarps.warp.to.*")) {
+                plugin.formator.sendMessage(player, plugin.noPermission);
+                return;
+            }
+        }
+
+        new BukkitPluginChannel(plugin, player, "WarpCommand", player.getName(), name.toLowerCase(),
+                player.hasPermission("masuitewarps.warp.global"),
+                player.hasPermission("masuitewarps.warp.server"),
+                player.hasPermission("masuitewarps.warp.hidden")).send();
     }
 
     @CommandAlias("setwarp")
@@ -74,7 +86,7 @@ public class WarpCommand extends BaseCommand {
     @Description("Lists all of the warps")
     @CommandCompletion("@warps")
     public void listWarpCommand(Player player) {
-        new BukkitPluginChannel(plugin, player, "ListWarps", plugin.checkPermissions(player), player.getName()).send();
+        new BukkitPluginChannel(plugin, player, "ListWarps", player.getName(), player.hasPermission("masuitewarps.list.global"), player.hasPermission("masuitewarps.list.server"), player.hasPermission("masuitewarps.list.hidden")).send();
     }
 
 }
