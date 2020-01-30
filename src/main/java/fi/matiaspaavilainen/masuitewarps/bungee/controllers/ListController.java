@@ -13,11 +13,12 @@ import java.util.List;
 public class ListController {
 
     private MaSuiteWarps plugin;
+
     public ListController(MaSuiteWarps plugin) {
         this.plugin = plugin;
     }
 
-    public void listWarp(ProxiedPlayer p, String permissions) {
+    public void listWarp(ProxiedPlayer p, boolean hasAccessToGlobal, boolean hasAccessToServer, boolean hasAccessToHidden) {
         TextComponent global = new TextComponent(plugin.formator.colorize(plugin.listHeaderGlobal));
         TextComponent server = new TextComponent(plugin.formator.colorize(plugin.listHeaderServer));
         TextComponent hidden = new TextComponent(plugin.formator.colorize(plugin.listHeaderHidden));
@@ -71,13 +72,13 @@ public class ListController {
             }
         }
 
-        if (permissions.contains("GLOBAL")) {
+        if (hasAccessToGlobal) {
             p.sendMessage(global);
         }
-        if (permissions.contains("SERVER")) {
+        if (hasAccessToServer) {
             p.sendMessage(server);
         }
-        if (permissions.contains("HIDDEN")) {
+        if (hasAccessToHidden) {
             p.sendMessage(hidden);
         }
     }
