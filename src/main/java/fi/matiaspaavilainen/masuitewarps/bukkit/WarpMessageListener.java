@@ -53,6 +53,9 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                     return;
                 }
             }
+            if (subchannel.equals("SetPerWarpFlag")) {
+                plugin.perServerWarps = in.readBoolean();
+            }
             if (subchannel.equals("DelWarp")) {
                 plugin.warps.remove(in.readUTF());
             }
