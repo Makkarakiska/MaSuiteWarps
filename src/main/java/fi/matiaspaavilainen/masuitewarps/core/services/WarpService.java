@@ -42,6 +42,13 @@ public class WarpService {
      * @param warp   target warp
      */
     private void teleport(ProxiedPlayer player, Warp warp) {
+        new BungeePluginChannel(plugin,
+                player.getServer().getInfo(),
+                "MaSuiteTeleports",
+                "GetLocation",
+                player.getName(),
+                player.getServer().getInfo().getName()).send();
+
         BungeePluginChannel bsc = new BungeePluginChannel(plugin, plugin.getProxy().getServerInfo(warp.getLocation().getServer()),
                 "WarpPlayer",
                 player.getUniqueId().toString(),
