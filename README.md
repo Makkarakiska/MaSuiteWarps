@@ -22,7 +22,7 @@ If you need support please check out the [wiki](https://github.com/masagameplay/
     - [x] Listing the warps
 - [x] Cooldown
 - [ ] Better syntax
-- [ ] Warmup
+- [x] Warmup
 - [x] Warp signs
 - [ ] Testing
 - [ ] Release on SpigotMC
