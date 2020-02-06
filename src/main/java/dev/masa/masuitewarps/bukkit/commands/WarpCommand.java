@@ -3,6 +3,7 @@ package dev.masa.masuitewarps.bukkit.commands;
 import dev.masa.masuitecore.acf.BaseCommand;
 import dev.masa.masuitecore.acf.annotation.*;
 import dev.masa.masuitecore.acf.bukkit.contexts.OnlinePlayer;
+import dev.masa.masuitecore.bukkit.MaSuiteCore;
 import dev.masa.masuitecore.core.adapters.BukkitAdapter;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitewarps.bukkit.MaSuiteWarps;
@@ -38,10 +39,14 @@ public class WarpCommand extends BaseCommand {
             }
         }
 
-        new BukkitPluginChannel(plugin, player, "Warp", player.getName(), name.toLowerCase(),
-                player.hasPermission("masuitewarps.warp.global"),
-                player.hasPermission("masuitewarps.warp.server"),
-                player.hasPermission("masuitewarps.warp.hidden")).send();
+        MaSuiteCore.warmupService.applyWarmup((Player) sender,"masuitewarps.warmup.override" ,"warps", success -> {
+            if (success) {
+                new BukkitPluginChannel(plugin, player, "Warp", player.getName(), name.toLowerCase(),
+                        player.hasPermission("masuitewarps.warp.global"),
+                        player.hasPermission("masuitewarps.warp.server"),
+                        player.hasPermission("masuitewarps.warp.hidden")).send();
+            }
+        });
     }
 
     @CommandAlias("setwarp")

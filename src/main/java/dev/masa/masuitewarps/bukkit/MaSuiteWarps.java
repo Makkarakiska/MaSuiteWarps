@@ -84,22 +84,8 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         warmupTime = config.load("warps", "config.yml").getInt("warmup");
 
         MaSuiteCore.cooldownService.addCooldownLength("warps", config.load("warps", "config.yml").getInt("cooldown"));
+        MaSuiteCore.warmupService.warmupTimes.put("warps", warmupTime);
     }
-
-    // TODO: Add proper warmup
-    /*@EventHandler
-    public void onMove(PlayerMoveEvent e) {
-        if (warmupTime > 0) {
-            if (warmups.contains(e.getPlayer().getUniqueId())) {
-
-                // Not move
-                if (e.getTo().getBlockX() == e.getFrom().getBlockX() && e.getTo().getBlockY() == e.getFrom().getBlockY() && e.getTo().getBlockZ() == e.getFrom().getBlockZ())
-                    return;
-                formator.sendMessage(e.getPlayer(), teleportationCancelled);
-                warmups.remove(e.getPlayer().getUniqueId());
-            }
-        }
-    }*/
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
