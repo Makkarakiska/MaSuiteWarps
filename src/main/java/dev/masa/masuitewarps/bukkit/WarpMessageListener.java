@@ -1,8 +1,8 @@
-package fi.matiaspaavilainen.masuitewarps.bukkit;
+package dev.masa.masuitewarps.bukkit;
 
-import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
-import fi.matiaspaavilainen.masuitecore.core.objects.Location;
-import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
+import dev.masa.masuitecore.core.adapters.BukkitAdapter;
+import dev.masa.masuitecore.core.objects.Location;
+import dev.masa.masuitewarps.core.models.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

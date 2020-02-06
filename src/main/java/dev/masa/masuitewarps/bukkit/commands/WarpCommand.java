@@ -1,11 +1,11 @@
-package fi.matiaspaavilainen.masuitewarps.bukkit.commands;
+package dev.masa.masuitewarps.bukkit.commands;
 
-import fi.matiaspaavilainen.masuitecore.acf.BaseCommand;
-import fi.matiaspaavilainen.masuitecore.acf.annotation.*;
-import fi.matiaspaavilainen.masuitecore.acf.bukkit.contexts.OnlinePlayer;
-import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
-import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
-import fi.matiaspaavilainen.masuitewarps.bukkit.MaSuiteWarps;
+import dev.masa.masuitecore.acf.BaseCommand;
+import dev.masa.masuitecore.acf.annotation.*;
+import dev.masa.masuitecore.acf.bukkit.contexts.OnlinePlayer;
+import dev.masa.masuitecore.core.adapters.BukkitAdapter;
+import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
+import dev.masa.masuitewarps.bukkit.MaSuiteWarps;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

@@ -1,6 +1,6 @@
-package fi.matiaspaavilainen.masuitewarps.bukkit;
+package dev.masa.masuitewarps.bukkit;
 
-import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
+import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;

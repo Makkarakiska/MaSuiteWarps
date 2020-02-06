@@ -1,18 +1,17 @@
-package fi.matiaspaavilainen.masuitewarps.bukkit;
+package dev.masa.masuitewarps.bukkit;
 
-import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
-import fi.matiaspaavilainen.masuitecore.bukkit.MaSuiteCore;
-import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.core.Updator;
-import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.utils.CommandManagerUtil;
-import fi.matiaspaavilainen.masuitewarps.bukkit.commands.WarpCommand;
-import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
+import dev.masa.masuitecore.acf.PaperCommandManager;
+import dev.masa.masuitecore.bukkit.MaSuiteCore;
+import dev.masa.masuitecore.bukkit.chat.Formator;
+import dev.masa.masuitecore.core.Updator;
+import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
+import dev.masa.masuitecore.core.configuration.BukkitConfiguration;
+import dev.masa.masuitecore.core.utils.CommandManagerUtil;
+import dev.masa.masuitewarps.bukkit.commands.WarpCommand;
+import dev.masa.masuitewarps.core.models.Warp;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.ByteArrayOutputStream;

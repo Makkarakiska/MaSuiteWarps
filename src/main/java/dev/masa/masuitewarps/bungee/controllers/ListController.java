@@ -1,7 +1,7 @@
-package fi.matiaspaavilainen.masuitewarps.bungee.controllers;
+package dev.masa.masuitewarps.bungee.controllers;
 
-import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
-import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
+import dev.masa.masuitewarps.bungee.MaSuiteWarps;
+import dev.masa.masuitewarps.core.models.Warp;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;

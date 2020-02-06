@@ -1,9 +1,9 @@
-package fi.matiaspaavilainen.masuitewarps.bungee.controllers;
+package dev.masa.masuitewarps.bungee.controllers;
 
-import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
-import fi.matiaspaavilainen.masuitecore.core.objects.Location;
-import fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps;
-import fi.matiaspaavilainen.masuitewarps.core.models.Warp;
+import dev.masa.masuitecore.core.channels.BungeePluginChannel;
+import dev.masa.masuitecore.core.objects.Location;
+import dev.masa.masuitewarps.bungee.MaSuiteWarps;
+import dev.masa.masuitewarps.core.models.Warp;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
