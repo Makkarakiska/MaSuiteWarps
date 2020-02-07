@@ -3,7 +3,6 @@ package dev.masa.masuitewarps.bukkit.commands;
 import dev.masa.masuitecore.acf.BaseCommand;
 import dev.masa.masuitecore.acf.annotation.*;
 import dev.masa.masuitecore.acf.bukkit.contexts.OnlinePlayer;
-import dev.masa.masuitecore.bukkit.MaSuiteCore;
 import dev.masa.masuitecore.core.adapters.BukkitAdapter;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitewarps.bukkit.MaSuiteWarps;
@@ -34,12 +33,12 @@ public class WarpCommand extends BaseCommand {
         // Check if player has permission to teleport to warp if per server warps is enabled
         if (plugin.perServerWarps) {
             if (!player.hasPermission("masuitewarps.warp.to." + name) && !player.hasPermission("masuitewarps.warp.to.*")) {
-                plugin.formator.sendMessage(player, plugin.noPermission);
+                sendNoPermissionMessage(player);
                 return;
             }
         }
 
-        MaSuiteCore.warmupService.applyWarmup((Player) sender,"masuitewarps.warmup.override" ,"warps", success -> {
+        plugin.api.getWarmupService().applyWarmup((Player) sender, "masuitewarps.warmup.override", "warps", success -> {
             if (success) {
                 new BukkitPluginChannel(plugin, player, "Warp", player.getName(), name.toLowerCase(),
                         player.hasPermission("masuitewarps.warp.global"),
@@ -63,15 +62,15 @@ public class WarpCommand extends BaseCommand {
 
         if (setting.equalsIgnoreCase("hidden") || setting.equalsIgnoreCase("global")) {
             if (setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.hidden")) {
-                plugin.formator.sendMessage(player, plugin.noPermission);
+                sendNoPermissionMessage(player);
                 return;
             }
             if (setting.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.warp.set.global")) {
-                plugin.formator.sendMessage(player, plugin.noPermission);
+                sendNoPermissionMessage(player);
                 return;
             }
             if (!setting.equalsIgnoreCase("global") && !setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.server")) {
-                plugin.formator.sendMessage(player, plugin.noPermission);
+                sendNoPermissionMessage(player);
                 return;
             }
             new BukkitPluginChannel(plugin, player, "SetWarp", 3, player.getName(), name, stringLocation, setting).send();
@@ -92,6 +91,10 @@ public class WarpCommand extends BaseCommand {
     @CommandCompletion("@warps")
     public void listWarpCommand(Player player) {
         new BukkitPluginChannel(plugin, player, "ListWarps", player.getName(), player.hasPermission("masuitewarps.list.global"), player.hasPermission("masuitewarps.list.server"), player.hasPermission("masuitewarps.list.hidden")).send();
+    }
+
+    private void sendNoPermissionMessage(Player player) {
+        plugin.formator.sendMessage(player, plugin.config.load(null, "messages.yml").getString("no-permission"));
     }
 
 }

@@ -1,9 +1,9 @@
 package dev.masa.masuitewarps.bukkit;
 
 import dev.masa.masuitecore.acf.PaperCommandManager;
-import dev.masa.masuitecore.bukkit.MaSuiteCore;
 import dev.masa.masuitecore.bukkit.chat.Formator;
 import dev.masa.masuitecore.core.Updator;
+import dev.masa.masuitecore.core.api.MaSuiteCoreBukkitAPI;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitecore.core.configuration.BukkitConfiguration;
 import dev.masa.masuitecore.core.utils.CommandManagerUtil;
@@ -17,23 +17,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MaSuiteWarps extends JavaPlugin implements Listener {
+
+    public MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
 
     public HashMap<String, Warp> warps = new HashMap<>();
 
     public BukkitConfiguration config = new BukkitConfiguration();
     public Formator formator = new Formator();
-
-    public String warpNotFound = "";
-    public String noPermission = "";
-    public String teleportationStarted = "";
-    public String teleportationCancelled = "";
-
-    public String inCooldown = "";
-    public int cooldownTime = 0;
-    public int warmupTime = 0;
 
     private boolean requestedPerServerWarps = false;
     public boolean perServerWarps = false;
@@ -41,10 +36,8 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-
         // Create configs
         config.create(this, "warps", "config.yml");
-        config.create(this, "warps", "messages.yml");
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new WarpCommand(this));
@@ -74,17 +67,8 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
         requestWarps();
 
-        warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
-        noPermission = config.load(null, "messages.yml").getString("no-permission");
-        teleportationStarted = config.load("warps", "messages.yml").getString("teleportation-started");
-        teleportationCancelled = config.load("warps", "messages.yml").getString("teleportation-cancelled");
-
-        cooldownTime = getConfig().getInt("cooldown");
-        inCooldown = config.load("warps", "config.yml").getString("cooldown");
-        warmupTime = config.load("warps", "config.yml").getInt("warmup");
-
-        MaSuiteCore.cooldownService.addCooldownLength("warps", config.load("warps", "config.yml").getInt("cooldown"));
-        MaSuiteCore.warmupService.warmupTimes.put("warps", warmupTime);
+        api.getCooldownService().addCooldownLength("warps", config.load("warps", "config.yml").getInt("cooldown"));
+        api.getWarmupService().addWarmupTime("warps", config.load("warps", "config.yml").getInt("warmup"));
     }
 
     @EventHandler
