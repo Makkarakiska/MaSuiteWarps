@@ -1,2 +1,2 @@
-enable-per-warp-permission: true #SetCommand this to false to disable per warp permission
+enable-per-warp-permission: true #Set this to false to disable per warp permission
 warp-delay: 750
