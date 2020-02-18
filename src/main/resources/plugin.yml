@@ -4,4 +4,3 @@ version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
 softdepend: [Multiverse, Multiworld]
-api-version: 1.15
