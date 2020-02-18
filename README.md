@@ -21,7 +21,7 @@ If you need support please check out the [wiki](https://github.com/masagameplay/
     - [x] Deleting a warp
     - [x] Listing the warps
 - [x] Cooldown
-- [ ] Better syntax
+- [x] Better syntax
 - [x] Warmup
 - [x] Warp signs
 - [ ] Testing
