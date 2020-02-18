@@ -13,53 +13,27 @@ public class SetController {
 
     private MaSuiteWarps plugin;
 
-    private boolean exists = false;
-
     public SetController(MaSuiteWarps plugin) {
         this.plugin = plugin;
     }
 
-    public Warp setWarp(ProxiedPlayer player, String name, Location loc) {
-        Warp warp = plugin.warpService.getWarp(name);
-        loc.setServer(player.getServer().getInfo().getName());
-        if (warp == null) {
-            warp = new Warp(name, false, true, loc);
-        } else {
-            warp.setLocation(loc);
-            exists = true;
-        }
-        return create(player, warp);
-    }
-
-    public Warp setWarp(ProxiedPlayer player, String name, Location loc, String type) {
+    public Warp setWarp(ProxiedPlayer player, String name, Location loc, boolean publicity, boolean type) {
         Warp warp = plugin.warpService.getWarp(name);
 
+        boolean exists = warp != null;
         loc.setServer(player.getServer().getInfo().getName());
 
-        boolean hidden = false;
-        boolean global = true;
-        if (warp != null) {
-            hidden = warp.isHidden();
-            global = warp.isGlobal();
-            exists = true;
-        }
-
-        if (type.equalsIgnoreCase("hidden")) {
-            hidden = !hidden;
-        } else if (type.equalsIgnoreCase("global")) {
-            global = !global;
-        } else {
-            return null;
-        }
-
         if (warp == null) {
-            warp = new Warp(name, hidden, global, loc);
+            warp = new Warp(name, publicity, type, loc);
+        } else {
+            warp.setHidden(publicity);
+            warp.setGlobal(type);
         }
 
-        return create(player, warp);
+        return create(player, warp, exists);
     }
 
-    private Warp create(ProxiedPlayer player, Warp warp) {
+    private Warp create(ProxiedPlayer player, Warp warp, boolean exists) {
         if (exists) {
             plugin.warpService.updateWarp(warp);
             plugin.formator.sendMessage(player, plugin.warpUpdated.replace("%warp%", warp.getName()));

@@ -122,7 +122,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
 
         if (subchannel.equals("SetWarp")) {
-            int i = in.readInt();
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
@@ -130,11 +129,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             String name = in.readUTF();
             Location location = new Location().deserialize(in.readUTF());
 
-            if (i == 3) {
-                set.setWarp(p, name, location, in.readUTF());
-            } else if (i == 2) {
-                set.setWarp(p, name, location);
-            }
+            set.setWarp(p, name, location, in.readBoolean(), in.readBoolean());
         }
         if (subchannel.equals("DelWarp")) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());

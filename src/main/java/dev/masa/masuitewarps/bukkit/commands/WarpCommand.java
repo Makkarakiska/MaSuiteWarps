@@ -51,30 +51,40 @@ public class WarpCommand extends BaseCommand {
     @CommandAlias("setwarp")
     @CommandPermission("masuitewarps.warp.set")
     @Description("Creates a new warp or updates an existing warp")
-    @CommandCompletion("@warps hidden|global")
-    public void setWarpCommand(Player player, @Single String name, @Optional @Single String setting) {
+    @CommandCompletion("@warps hidden|public server|global")
+    public void setWarpCommand(Player player, @Single String name, @Single String publicity, @Single String type) {
         Location loc = player.getLocation();
         String stringLocation = BukkitAdapter.adapt(loc).serialize();
-        if (setting == null) {
-            new BukkitPluginChannel(plugin, player, "SetWarp", 2, player.getName(), name, stringLocation).send();
+
+        if (!publicity.equalsIgnoreCase("hidden") && !publicity.equalsIgnoreCase("public")) {
             return;
         }
 
-        if (setting.equalsIgnoreCase("hidden") || setting.equalsIgnoreCase("global")) {
-            if (setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.hidden")) {
-                sendNoPermissionMessage(player);
-                return;
-            }
-            if (setting.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.warp.set.global")) {
-                sendNoPermissionMessage(player);
-                return;
-            }
-            if (!setting.equalsIgnoreCase("global") && !setting.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.server")) {
-                sendNoPermissionMessage(player);
-                return;
-            }
-            new BukkitPluginChannel(plugin, player, "SetWarp", 3, player.getName(), name, stringLocation, setting).send();
+        if (!type.equalsIgnoreCase("server") && !type.equalsIgnoreCase("global")) {
+            return;
         }
+
+        if (publicity.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.hidden")) {
+            sendNoPermissionMessage(player);
+            return;
+        }
+
+        if (publicity.equalsIgnoreCase("public") && !player.hasPermission("masuitewarps.warp.set.public")) {
+            sendNoPermissionMessage(player);
+            return;
+        }
+
+        if (type.equalsIgnoreCase("server") && !player.hasPermission("masuitewarps.warp.set.server")) {
+            sendNoPermissionMessage(player);
+            return;
+        }
+
+        if (type.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.warp.set.global")) {
+            sendNoPermissionMessage(player);
+            return;
+        }
+
+        new BukkitPluginChannel(plugin, player, "SetWarp", player.getName(), name, stringLocation, publicity.equalsIgnoreCase("hidden"), type.equalsIgnoreCase("global")).send();
     }
 
     @CommandAlias("delwarp|warpdel|deletewarp")
