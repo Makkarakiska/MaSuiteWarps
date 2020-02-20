@@ -113,7 +113,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
 
         if (subchannel.equals("Warp")) {
-            teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean(), in.readBoolean(), in.readBoolean());
+            teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean(), in.readBoolean(), in.readBoolean(), in.readBoolean());
         }
 
         if (subchannel.equals("CheckPerWarpFlag")) {

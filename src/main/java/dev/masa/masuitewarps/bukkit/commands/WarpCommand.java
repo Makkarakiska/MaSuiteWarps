@@ -23,9 +23,17 @@ public class WarpCommand extends BaseCommand {
     @Description("Warps to target")
     @CommandCompletion("@warps @masuite_players")
     @Conditions("cooldown:type=warps,bypass=masuitewarps.cooldown.override")
-    public void teleportWarpCommand(CommandSender sender, @Single String name, @Optional @Single @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer) {
+    public void teleportWarpCommand(CommandSender sender, @Single String name,
+                                    @Optional @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer,
+                                    @Optional @Single @CommandPermission("masuitewarps.warp.silent") String silentArg) {
+
+        boolean silent = false;
+        if (silentArg != null && silentArg.equalsIgnoreCase("-s")) {
+            silent = true;
+        }
+
         if (!(sender instanceof Player) || onlinePlayer != null) {
-            new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true).send();
+            new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true, silent).send();
             return;
         }
         Player player = (Player) sender;
@@ -38,12 +46,13 @@ public class WarpCommand extends BaseCommand {
             }
         }
 
+        boolean finalSilent = silent;
         plugin.api.getWarmupService().applyWarmup((Player) sender, "masuitewarps.warmup.override", "warps", success -> {
             if (success) {
                 new BukkitPluginChannel(plugin, player, "Warp", player.getName(), name.toLowerCase(),
                         player.hasPermission("masuitewarps.warp.global"),
                         player.hasPermission("masuitewarps.warp.server"),
-                        player.hasPermission("masuitewarps.warp.hidden")).send();
+                        player.hasPermission("masuitewarps.warp.hidden"), finalSilent).send();
             }
         });
     }

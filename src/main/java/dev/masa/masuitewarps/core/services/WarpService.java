@@ -30,9 +30,10 @@ public class WarpService {
      *
      * @param player player to teleport
      * @param warp   target warp
+     * @param silent do we send a message to the player or not
      */
-    public void teleportToWarp(ProxiedPlayer player, Warp warp) {
-        this.teleport(player, warp);
+    public void teleportToWarp(ProxiedPlayer player, Warp warp, boolean silent) {
+        this.teleport(player, warp, silent);
     }
 
     /**
@@ -40,8 +41,9 @@ public class WarpService {
      *
      * @param player player to teleport
      * @param warp   target warp
+     *               @param silent do we send a message to the player or not
      */
-    private void teleport(ProxiedPlayer player, Warp warp) {
+    private void teleport(ProxiedPlayer player, Warp warp, boolean silent) {
         new BungeePluginChannel(plugin,
                 player.getServer().getInfo(),
                 "MaSuiteTeleports",
@@ -63,7 +65,10 @@ public class WarpService {
         } else {
             bsc.send();
         }
-        plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
+        if(!silent) {
+            plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
+        }
+
     }
 
     /**
