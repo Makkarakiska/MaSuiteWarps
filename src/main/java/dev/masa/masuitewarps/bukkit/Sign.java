@@ -59,7 +59,7 @@ public class Sign implements Listener {
                 new BukkitPluginChannel(plugin, player, "Warp", player.getName(), warp,
                         player.hasPermission("masuitewarps.warp.sign.global"),
                         player.hasPermission("masuitewarps.warp.sign.server"),
-                        player.hasPermission("masuitewarps.warp.sign.hidden")).send();
+                        player.hasPermission("masuitewarps.warp.sign.hidden"), false).send();
             }
 
         }
