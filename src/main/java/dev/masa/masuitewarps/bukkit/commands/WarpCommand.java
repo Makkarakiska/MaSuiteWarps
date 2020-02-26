@@ -47,12 +47,14 @@ public class WarpCommand extends BaseCommand {
         }
 
         boolean finalSilent = silent;
-        plugin.api.getWarmupService().applyWarmup((Player) sender, "masuitewarps.warmup.override", "warps", success -> {
+        plugin.api.getWarmupService().applyWarmup(player, "masuitewarps.warmup.override", "warps", success -> {
             if (success) {
+                new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "GetLocation", player.getName(), BukkitAdapter.adapt(player.getLocation()).serialize()).send();
                 new BukkitPluginChannel(plugin, player, "Warp", player.getName(), name.toLowerCase(),
                         player.hasPermission("masuitewarps.warp.global"),
                         player.hasPermission("masuitewarps.warp.server"),
-                        player.hasPermission("masuitewarps.warp.hidden"), finalSilent).send();
+                        player.hasPermission("masuitewarps.warp.hidden"),
+                        finalSilent).send();
             }
         });
     }
