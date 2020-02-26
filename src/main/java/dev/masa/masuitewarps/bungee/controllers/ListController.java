@@ -27,49 +27,26 @@ public class ListController {
 
         int i = 0;
         String split = plugin.formator.colorize(plugin.listWarpSplitter);
-        for (Warp warp : plugin.warpService.getAllWarps()) {
+        for (Warp warp : warps) {
             if (warp.isGlobal() && !warp.isHidden()) {
-                if (i++ == warps.size() - 1) {
-                    TextComponent hc = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
-                    hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
-                    global.addExtra(hc);
-                } else {
-                    TextComponent hc = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
-                    hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
-                    global.addExtra(hc);
+                global.addExtra(buildAndAddListElement(warp));
+                if (i != warps.size() - 1) {
                     global.addExtra(split);
                 }
             }
             if (!warp.isGlobal() && warp.getLocation().getServer().equals(p.getServer().getInfo().getName()) && !warp.isHidden()) {
-                if (i++ == warps.size() - 1) {
-                    TextComponent hc = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
-                    hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
-                    server.addExtra(hc);
-                } else {
-                    TextComponent hc = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
-                    hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
-                    server.addExtra(hc);
+                server.addExtra(buildAndAddListElement(warp));
+                if (i != warps.size() - 1) {
                     server.addExtra(split);
                 }
             }
             if (warp.isHidden()) {
-                if (i++ == warps.size() - 1) {
-                    TextComponent hc = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
-                    hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
-                    hidden.addExtra(hc);
-                } else {
-                    TextComponent hc = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
-                    hc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
-                    hc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
-                    hidden.addExtra(hc);
+                hidden.addExtra(buildAndAddListElement(warp));
+                if (i != warps.size() - 1) {
                     hidden.addExtra(split);
                 }
             }
+            i++;
         }
 
         if (hasAccessToGlobal) {
@@ -81,5 +58,13 @@ public class ListController {
         if (hasAccessToHidden) {
             p.sendMessage(hidden);
         }
+    }
+
+    private TextComponent buildAndAddListElement(Warp warp) {
+        TextComponent textComponent = new TextComponent(plugin.formator.colorize(plugin.listWarpName.replace("%warp%", warp.getName())));
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + warp.getName()));
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(plugin.formator.colorize(plugin.listHoverText.replace("%warp%", warp.getName()))).create()));
+
+        return textComponent;
     }
 }
