@@ -28,6 +28,7 @@ public class SetController {
         } else {
             warp.setHidden(publicity);
             warp.setGlobal(type);
+            warp.setLocation(loc);
         }
 
         return create(player, warp, exists);
