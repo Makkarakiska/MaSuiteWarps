@@ -4,3 +4,4 @@ version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
 softdepend: [Multiverse, Multiworld]
+loadbefore: [Essentials]
