@@ -63,9 +63,14 @@ public class WarpCommand extends BaseCommand {
     @CommandPermission("masuitewarps.warp.set")
     @Description("Creates a new warp or updates an existing warp")
     @CommandCompletion("@warps hidden|public server|global")
-    public void setWarpCommand(Player player, @Single String name, @Single String publicity, @Single String type) {
+    public void setWarpCommand(Player player, @Single String name, @Optional @Single String publicity, @Optional @Single String type) {
         Location loc = player.getLocation();
         String stringLocation = BukkitAdapter.adapt(loc).serialize();
+
+        if(publicity == null || type == null) {
+            publicity = "public";
+            type = "global";
+        }
 
         if (!publicity.equalsIgnoreCase("hidden") && !publicity.equalsIgnoreCase("public")) {
             return;
