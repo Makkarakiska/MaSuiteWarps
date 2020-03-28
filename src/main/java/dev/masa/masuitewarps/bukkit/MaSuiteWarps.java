@@ -68,8 +68,6 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
         new Updator(getDescription().getVersion(), getDescription().getName(), "60454").checkUpdates();
 
-        requestWarps();
-
         api.getCooldownService().addCooldownLength("warps", config.load("warps", "config.yml").getInt("cooldown"));
         api.getWarmupService().addWarmupTime("warps", config.load("warps", "config.yml").getInt("warmup"));
     }
@@ -85,13 +83,4 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         }
     }
 
-    private void requestWarps() {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("RequestWarps");
-            getServer().getScheduler().runTaskTimerAsynchronously(this, () -> getServer().sendPluginMessage(this, "BungeeCord", b.toByteArray()), 0, 3000);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
