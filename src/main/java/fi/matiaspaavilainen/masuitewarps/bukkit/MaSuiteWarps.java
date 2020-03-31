@@ -120,7 +120,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         try (ByteArrayOutputStream b = new ByteArrayOutputStream();
              DataOutputStream out = new DataOutputStream(b)) {
             out.writeUTF("RequestWarps");
-            getServer().getScheduler().runTaskTimerAsynchronously(this, () -> getServer().sendPluginMessage(this, "BungeeCord", b.toByteArray()), 0, 3000);
+            getServer().getScheduler().runTaskTimerAsynchronously(this, () -> getServer().sendPluginMessage(this, "BungeeCord", b.toByteArray()), 0, 600000);
         } catch (
                 IOException e) {
             e.printStackTrace();
