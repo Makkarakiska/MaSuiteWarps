@@ -1,13 +1,17 @@
 package dev.masa.masuitewarps.core.services;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.table.TableUtils;
 import dev.masa.masuitecore.core.channels.BungeePluginChannel;
-import dev.masa.masuitecore.core.utils.HibernateUtil;
 import dev.masa.masuitewarps.bungee.MaSuiteWarps;
 import dev.masa.masuitewarps.core.models.Warp;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import javax.persistence.EntityManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,13 +20,16 @@ import java.util.concurrent.TimeUnit;
 
 public class WarpService {
 
-    private EntityManager entityManager = HibernateUtil.addClasses(Warp.class).getEntityManager();
-    public HashMap<String, Warp> warps = new HashMap<>();
-
+    @Getter
+    private HashMap<String, Warp> warps = new HashMap<>();
+    private Dao<Warp, Integer> warpDao;
     private MaSuiteWarps plugin;
 
+    @SneakyThrows
     public WarpService(MaSuiteWarps plugin) {
         this.plugin = plugin;
+        this.warpDao = DaoManager.createDao(plugin.getApi().getDatabaseService().getConnection(), Warp.class);
+        TableUtils.createTableIfNotExists(plugin.getApi().getDatabaseService().getConnection(), Warp.class);
     }
 
     /**
@@ -41,7 +48,7 @@ public class WarpService {
      *
      * @param player player to teleport
      * @param warp   target warp
-     *               @param silent do we send a message to the player or not
+     * @param silent do we send a message to the player or not
      */
     private void teleport(ProxiedPlayer player, Warp warp, boolean silent) {
         new BungeePluginChannel(plugin,
@@ -65,7 +72,7 @@ public class WarpService {
         } else {
             bsc.send();
         }
-        if(!silent) {
+        if (!silent) {
             plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
         }
 
@@ -98,9 +105,11 @@ public class WarpService {
      */
     public Warp createWarp(Warp warp) {
         plugin.getProxy().getScheduler().runAsync(plugin, () -> {
-            entityManager.getTransaction().begin();
-            entityManager.persist(warp);
-            entityManager.getTransaction().commit();
+            try {
+                warpDao.create(warp);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
         warps.put(warp.getName(), warp);
         this.sendWarpToServers(warp);
@@ -115,9 +124,11 @@ public class WarpService {
      */
     public Warp updateWarp(Warp warp) {
         plugin.getProxy().getScheduler().runAsync(plugin, () -> {
-            entityManager.getTransaction().begin();
-            entityManager.merge(warp);
-            entityManager.getTransaction().commit();
+            try {
+                warpDao.update(warp);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
         warps.put(warp.getName(), warp);
 
@@ -132,9 +143,11 @@ public class WarpService {
      */
     public boolean removeWarp(Warp warp) {
         plugin.getProxy().getScheduler().runAsync(plugin, () -> {
-            entityManager.getTransaction().begin();
-            entityManager.remove(warp);
-            entityManager.getTransaction().commit();
+            try {
+                warpDao.delete(warp);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
             for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
                 ServerInfo serverInfo = entry.getValue();
@@ -153,9 +166,9 @@ public class WarpService {
     /**
      * Initialize warps for use
      */
+    @SneakyThrows
     public void initializeWarps() {
-        List<Warp> warpList = entityManager.createQuery("SELECT w FROM Warp w", Warp.class).getResultList();
-        warpList.forEach(warp -> warps.put(warp.getName(), warp));
+        warpDao.queryForAll().forEach(warp -> warps.put(warp.getName(), warp));
     }
 
     /**
@@ -164,12 +177,13 @@ public class WarpService {
      * @param name name of the warp
      * @return returns loaded warp or null
      */
+    @SneakyThrows
     private Warp loadWarp(String name) {
         if (warps.containsKey(name)) {
             return warps.get(name);
         }
 
-        Warp warp = entityManager.createNamedQuery("findWarp", Warp.class).setParameter("name", name).getResultList().stream().findFirst().orElse(null);
+        Warp warp = warpDao.queryForEq("name", name).stream().findFirst().orElse(null);
         if (warp != null) {
             warps.put(name, warp);
         }

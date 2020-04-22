@@ -1,50 +1,68 @@
 package dev.masa.masuitewarps.core.models;
 
 import com.google.gson.Gson;
+import com.j256.ormlite.field.DatabaseField;
 import dev.masa.masuitecore.core.objects.Location;
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Table;
+
 
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Data
-@Entity
 @Table(name = "masuite_warps")
-
-@NamedQuery(
-        name = "findWarp",
-        query = "SELECT w FROM Warp w WHERE w.name = :name ORDER BY w.name"
-)
 public class Warp {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @DatabaseField(generatedId = true)
     private int id;
 
-    @NonNull
-    @Column(name = "name", unique = true)
+    @DatabaseField(unique = true, canBeNull = false)
     private String name;
 
     @NonNull
-    @Column(name = "hidden")
+    @DatabaseField
     private Boolean hidden;
 
     @NonNull
-    @Column(name = "global")
+    @DatabaseField
     private Boolean global;
 
-    @Embedded
-    @AttributeOverrides(value = {
-            @AttributeOverride(name = "x", column = @Column(name = "x")),
-            @AttributeOverride(name = "y", column = @Column(name = "y")),
-            @AttributeOverride(name = "z", column = @Column(name = "z")),
-            @AttributeOverride(name = "yaw", column = @Column(name = "yaw")),
-            @AttributeOverride(name = "pitch", column = @Column(name = "pitch")),
-            @AttributeOverride(name = "server", column = @Column(name = "server"))
-    })
-    @NonNull
-    private Location location;
+    @DatabaseField
+    private String server;
+    @DatabaseField
+    private String world;
+    @DatabaseField
+    private Double x;
+    @DatabaseField
+    private Double y;
+    @DatabaseField
+    private Double z;
+    @DatabaseField
+    private Float yaw = 0.0F;
+    @DatabaseField
+    private Float pitch = 0.0F;
+
+    public Warp(String name, boolean publicity, boolean type, Location location) {
+        this.name = name;
+        this.global = publicity;
+        this.hidden = type;
+        this.setLocation(location);
+    }
+
+    public Location getLocation() {
+        return new Location(server, world, x, y, z, yaw, pitch);
+    }
+
+    public void setLocation(Location loc) {
+        this.server = loc.getServer();
+        this.world = loc.getWorld();
+        this.x = loc.getX();
+        this.y = loc.getY();
+        this.z = loc.getZ();
+        this.yaw = loc.getYaw();
+        this.pitch = loc.getPitch();
+    }
 
     public boolean isHidden() {
         return this.hidden;

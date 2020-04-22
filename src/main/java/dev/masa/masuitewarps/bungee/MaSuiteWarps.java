@@ -3,6 +3,7 @@ package dev.masa.masuitewarps.bungee;
 import dev.masa.masuitecore.bungee.Utils;
 import dev.masa.masuitecore.bungee.chat.Formator;
 import dev.masa.masuitecore.core.Updator;
+import dev.masa.masuitecore.core.api.MaSuiteCoreAPI;
 import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuitecore.core.configuration.BungeeConfiguration;
 import dev.masa.masuitecore.core.objects.Location;
@@ -11,6 +12,7 @@ import dev.masa.masuitewarps.bungee.controllers.ListController;
 import dev.masa.masuitewarps.bungee.controllers.SetController;
 import dev.masa.masuitewarps.bungee.controllers.TeleportController;
 import dev.masa.masuitewarps.core.services.WarpService;
+import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -55,10 +57,12 @@ public class MaSuiteWarps extends Plugin implements Listener {
     private DeleteController delete = new DeleteController(this);
     private ListController list = new ListController(this);
 
+    @Getter
+    private MaSuiteCoreAPI api = new MaSuiteCoreAPI();
+
     @Override
     public void onEnable() {
         // Configuration
-        BungeeConfiguration config = new BungeeConfiguration();
         config.create(this, "warps", "messages.yml");
         config.create(this, "warps", "settings.yml");
         config.addDefault("warps/settings.yml", "warp-delay", 750);
