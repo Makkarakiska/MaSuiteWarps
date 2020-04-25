@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fi.matiaspaavilainen</groupId>
+    <groupId>dev.masa</groupId>
     <artifactId>MaSuiteWarps</artifactId>
-    <version>1.4.7.4</version>
+    <version>2.0.0</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -41,36 +41,38 @@
     </build>
     <repositories>
         <repository>
-            <id>bungeecord-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-snapshots/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>codemc-repo</id>
-            <url>https://repo.codemc.org/repository/maven-snapshots/</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.13-SNAPSHOT</version>
+            <version>1.15-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.13.2-R0.1-SNAPSHOT</version>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>fi.matiaspaavilainen</groupId>
+            <groupId>dev.masa</groupId>
             <artifactId>MaSuiteCore</artifactId>
-            <version>1.5.3-SNAPSHOT</version>
+            <version>2.0.0-20200422.112832-18</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

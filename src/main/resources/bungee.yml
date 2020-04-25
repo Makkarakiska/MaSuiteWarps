@@ -1,5 +1,5 @@
 name: MaSuiteWarps
-main: fi.matiaspaavilainen.masuitewarps.bungee.MaSuiteWarps
+main: dev.masa.masuitewarps.bungee.MaSuiteWarps
 version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
