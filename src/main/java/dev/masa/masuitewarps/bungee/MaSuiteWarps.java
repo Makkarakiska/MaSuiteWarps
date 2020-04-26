@@ -50,8 +50,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
     public String warpUpdated = "";
     public String warpDeleted = "";
 
-    public int warpDelay = 500;
-
     private TeleportController teleportController = new TeleportController(this);
     private SetController set = new SetController(this);
     private DeleteController delete = new DeleteController(this);
@@ -65,7 +63,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
         // Configuration
         config.create(this, "warps", "messages.yml");
         config.create(this, "warps", "settings.yml");
-        config.addDefault("warps/settings.yml", "warp-delay", 750);
         getProxy().getPluginManager().registerListener(this, this);
 
         warpService = new WarpService(this);
@@ -96,8 +93,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
         warpCreated = config.load("warps", "messages.yml").getString("warp-created");
         warpUpdated = config.load("warps", "messages.yml").getString("warp-updated");
         warpDeleted = config.load("warps", "messages.yml").getString("warp-deleted");
-
-        warpDelay = config.load("warps", "settings.yml").getInt("warp-delay");
     }
 
     @EventHandler

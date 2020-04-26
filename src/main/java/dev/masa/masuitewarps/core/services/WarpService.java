@@ -68,7 +68,7 @@ public class WarpService {
             plugin.getProxy().getScheduler().schedule(plugin, () -> {
                 bsc.send();
                 plugin.utils.applyCooldown(plugin, player.getUniqueId(), "warps");
-            }, plugin.warpDelay, TimeUnit.MILLISECONDS);
+            }, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
         } else {
             bsc.send();
         }
