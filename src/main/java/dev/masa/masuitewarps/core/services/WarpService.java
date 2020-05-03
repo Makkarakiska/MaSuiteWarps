@@ -111,7 +111,7 @@ public class WarpService {
                 e.printStackTrace();
             }
         });
-        warps.put(warp.getName(), warp);
+        warps.put(warp.getName().toLowerCase(), warp);
         this.sendWarpToServers(warp);
         return warp;
     }
@@ -130,7 +130,7 @@ public class WarpService {
                 e.printStackTrace();
             }
         });
-        warps.put(warp.getName(), warp);
+        warps.put(warp.getName().toLowerCase(), warp);
 
         this.sendWarpToServers(warp);
         return warp;
@@ -159,7 +159,7 @@ public class WarpService {
             }
         });
 
-        warps.remove(warp.getName());
+        warps.remove(warp.getName().toLowerCase());
         return true;
     }
 
@@ -168,7 +168,7 @@ public class WarpService {
      */
     @SneakyThrows
     public void initializeWarps() {
-        warpDao.queryForAll().forEach(warp -> warps.put(warp.getName(), warp));
+        warpDao.queryForAll().forEach(warp -> warps.put(warp.getName().toLowerCase(), warp));
     }
 
     /**
@@ -179,13 +179,13 @@ public class WarpService {
      */
     @SneakyThrows
     private Warp loadWarp(String name) {
-        if (warps.containsKey(name)) {
-            return warps.get(name);
+        if (warps.containsKey(name.toLowerCase())) {
+            return warps.get(name.toLowerCase());
         }
 
         Warp warp = warpDao.queryForEq("name", name).stream().findFirst().orElse(null);
         if (warp != null) {
-            warps.put(name, warp);
+            warps.put(name.toLowerCase(), warp);
         }
 
         return warp;

@@ -25,7 +25,8 @@ import java.io.IOException;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
-    public WarpService warpService;
+    @Getter
+    private WarpService warpService;
 
     public Utils utils = new Utils();
     public BungeeConfiguration config = new BungeeConfiguration();
@@ -121,14 +122,14 @@ public class MaSuiteWarps extends Plugin implements Listener {
         }
 
         if (subchannel.equals("SetWarp")) {
-            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
-            if (p == null) {
+            ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
+            if (player == null) {
                 return;
             }
             String name = in.readUTF();
             Location location = new Location().deserialize(in.readUTF());
 
-            set.setWarp(p, name, location, in.readBoolean(), in.readBoolean());
+            set.setWarp(player, name, location, in.readBoolean(), in.readBoolean());
         }
         if (subchannel.equals("DelWarp")) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
@@ -138,7 +139,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
             delete.deleteWarp(p, in.readUTF());
         }
         if (subchannel.equals("RequestWarps")) {
-            this.warpService.sendAllWarpsToServers();
+            this.getWarpService().sendAllWarpsToServers();
         }
     }
 }

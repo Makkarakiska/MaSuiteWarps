@@ -67,7 +67,7 @@ public class WarpCommand extends BaseCommand {
         Location loc = player.getLocation();
         String stringLocation = BukkitAdapter.adapt(loc).serialize();
 
-        if(publicity == null || type == null) {
+        if (publicity == null || type == null) {
             publicity = "public";
             type = "global";
         }

@@ -23,7 +23,7 @@ public class ListController {
         TextComponent server = new TextComponent(plugin.formator.colorize(plugin.listHeaderServer));
         TextComponent hidden = new TextComponent(plugin.formator.colorize(plugin.listHeaderHidden));
 
-        List<Warp> warps = plugin.warpService.getAllWarps();
+        List<Warp> warps = plugin.getWarpService().getAllWarps();
 
         int i = 0;
         String split = plugin.formator.colorize(plugin.listWarpSplitter);

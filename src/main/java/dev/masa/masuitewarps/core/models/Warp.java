@@ -45,8 +45,8 @@ public class Warp {
 
     public Warp(String name, boolean publicity, boolean type, Location location) {
         this.name = name;
-        this.global = publicity;
-        this.hidden = type;
+        this.hidden = publicity;
+        this.global = type;
         this.setLocation(location);
     }
 

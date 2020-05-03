@@ -18,7 +18,7 @@ public class SetController {
     }
 
     public Warp setWarp(ProxiedPlayer player, String name, Location loc, boolean publicity, boolean type) {
-        Warp warp = plugin.warpService.getWarp(name);
+        Warp warp = plugin.getWarpService().getWarp(name);
 
         boolean exists = warp != null;
         loc.setServer(player.getServer().getInfo().getName());
@@ -36,10 +36,10 @@ public class SetController {
 
     private Warp create(ProxiedPlayer player, Warp warp, boolean exists) {
         if (exists) {
-            plugin.warpService.updateWarp(warp);
+            plugin.getWarpService().updateWarp(warp);
             plugin.formator.sendMessage(player, plugin.warpUpdated.replace("%warp%", warp.getName()));
         } else {
-            plugin.warpService.createWarp(warp);
+            plugin.getWarpService().createWarp(warp);
             plugin.formator.sendMessage(player, plugin.warpCreated.replace("%warp%", warp.getName()));
         }
 

@@ -17,12 +17,12 @@ public class DeleteController {
     }
 
     public void deleteWarp(ProxiedPlayer player, String name) {
-        Warp warp = plugin.warpService.getWarp(name);
+        Warp warp = plugin.getWarpService().getWarp(name);
         if (warp == null) {
             plugin.formator.sendMessage(player, plugin.warpNotFound);
             return;
         }
-        if (plugin.warpService.removeWarp(warp)) {
+        if (plugin.getWarpService().removeWarp(warp)) {
             plugin.formator.sendMessage(player, plugin.warpDeleted.replace("%warp%", warp.getName()));
             for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
                 ServerInfo serverInfo = entry.getValue();

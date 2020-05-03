@@ -12,9 +12,9 @@ public class TeleportController {
     }
 
     public void teleport(ProxiedPlayer player, String name, boolean hasAccessToGlobal, boolean hasAccessToServer, boolean hasAccessToHidden, boolean silent) {
-        Warp warp = plugin.warpService.getWarp(name);
+        Warp warp = plugin.getWarpService().getWarp(name);
         if (checkWarp(player, warp, hasAccessToGlobal, hasAccessToServer, hasAccessToHidden)) {
-            plugin.warpService.teleportToWarp(player, warp, silent);
+            plugin.getWarpService().teleportToWarp(player, warp, silent);
         }
     }
 
