@@ -2,6 +2,7 @@ package dev.masa.masuitewarps.core.services;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.table.TableUtils;
 import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuitewarps.bungee.MaSuiteWarps;
@@ -183,7 +184,8 @@ public class WarpService {
             return warps.get(name.toLowerCase());
         }
 
-        Warp warp = warpDao.queryForEq("name", name).stream().findFirst().orElse(null);
+        SelectArg preparedName = new SelectArg(name);
+        Warp warp = warpDao.queryForEq("name", preparedName).stream().findFirst().orElse(null);
         if (warp != null) {
             warps.put(name.toLowerCase(), warp);
         }
