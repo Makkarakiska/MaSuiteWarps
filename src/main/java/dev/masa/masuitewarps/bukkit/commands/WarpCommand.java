@@ -6,6 +6,7 @@ import dev.masa.masuitecore.acf.bukkit.contexts.OnlinePlayer;
 import dev.masa.masuitecore.core.adapters.BukkitAdapter;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitewarps.bukkit.MaSuiteWarps;
+import dev.masa.masuitewarps.core.models.Warp;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,19 +33,32 @@ public class WarpCommand extends BaseCommand {
             silent = true;
         }
 
+        // Check if player has permission to teleport to warp if per server warps is enabled
+        if (plugin.perServerWarps) {
+            if (!sender.hasPermission("masuitewarps.warp.to." + name) && !sender.hasPermission("masuitewarps.warp.to.*")) {
+                if (sender instanceof Player) {
+                    sendNoPermissionMessage((Player) sender);
+                }
+                return;
+            }
+        }
+
         if (!(sender instanceof Player) || onlinePlayer != null) {
+            Warp warp = plugin.warps.get(name);
+
+            if (warp != null) {
+                if (warp.isHidden() && !sender.hasPermission("masuitewarps.warp.hidden")) {
+                    if (sender instanceof Player) {
+                        sendNoPermissionMessage((Player) sender);
+                        return;
+                    }
+                }
+            }
+
             new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true, silent).send();
             return;
         }
         Player player = (Player) sender;
-
-        // Check if player has permission to teleport to warp if per server warps is enabled
-        if (plugin.perServerWarps) {
-            if (!player.hasPermission("masuitewarps.warp.to." + name) && !player.hasPermission("masuitewarps.warp.to.*")) {
-                sendNoPermissionMessage(player);
-                return;
-            }
-        }
 
         boolean finalSilent = silent;
         plugin.api.getWarmupService().applyWarmup(player, "masuitewarps.warmup.override", "warps", success -> {
