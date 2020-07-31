@@ -65,11 +65,15 @@ public class WarpService {
                 warp.getLocation().serialize()
         );
         if (!player.getServer().getInfo().getName().equals(warp.getLocation().getServer())) {
-            player.connect(plugin.getProxy().getServerInfo(warp.getLocation().getServer()));
-            plugin.getProxy().getScheduler().schedule(plugin, () -> {
-                bsc.send();
-                plugin.utils.applyCooldown(plugin, player.getUniqueId(), "warps");
-            }, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+            plugin.getProxy().getScheduler().runAsync(plugin, () -> player.connect(plugin.getProxy().getServerInfo(warp.getLocation().getServer()), ((connected, throwable) -> {
+                if (connected) {
+                    plugin.getProxy().getScheduler().schedule(plugin, () -> {
+                        bsc.send();
+                        plugin.utils.applyCooldown(plugin, player.getUniqueId(), "warps");
+                    }, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+                }
+            })));
+
         } else {
             bsc.send();
         }
