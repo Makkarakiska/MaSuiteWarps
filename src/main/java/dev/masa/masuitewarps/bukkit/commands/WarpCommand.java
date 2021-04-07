@@ -55,7 +55,8 @@ public class WarpCommand extends BaseCommand {
                 }
             }
 
-            new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true, silent).send();
+            if(onlinePlayer != null)
+                new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true, silent).send();
             return;
         }
         Player player = (Player) sender;
